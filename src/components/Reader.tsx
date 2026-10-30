@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, List, MessageSquare, X } from 'lucide-react';
 import type { Block, Book } from '../shared/schema';
 import { getBook } from '../lib/content';
 import { getNotes, getProgress, saveNote, saveProgress, type Progress } from '../lib/storage';
 import BookmarkButton from './BookmarkButton';
+import { getWordEntries } from '../lib/word-data';
 import { WordDefinition, WordHelpProvider, WordText } from './WordHelp';
 import { CounterLab, DialogueLab, PositionLab, ResetButton, SentenceLab } from './Widgets';
 
@@ -33,6 +34,7 @@ export default function Reader() {
   const {bookId='',pageId=''}=useParams(),location=useLocation();
   const [book,setBook]=useState<Book>(),[error,setError]=useState(''),[toc,setToc]=useState(false),[panel,setPanel]=useState<'dictionary'|'sources'|'notes'|null>(null),[showSources,setShowSources]=useState(false),[epoch,setEpoch]=useState(0),[progress,setProgress]=useState<Progress>(),[note,setNote]=useState(''),[saveMessage,setSaveMessage]=useState(''),[dictionaryQuery,setDictionaryQuery]=useState('');
   const progressRef=useRef<Progress|undefined>(undefined),tracked=useRef<Progress|undefined>(undefined),restored=useRef(false);
+  const dictionaryEntries=useMemo(()=>book?.subject==='japanese'?getWordEntries(book.glossary):book?.glossary||[],[book]);
   const sheetRef=useRef<HTMLDivElement>(null),openerRef=useRef<HTMLElement|null>(null);
   const [mobilePanel,setMobilePanel]=useState(()=>window.matchMedia('(max-width:760px)').matches);
   useEffect(()=>{const media=window.matchMedia('(max-width:760px)'),change=()=>setMobilePanel(media.matches);media.addEventListener('change',change);return()=>media.removeEventListener('change',change);},[]);
@@ -98,14 +100,14 @@ export default function Reader() {
     <aside className={'toc '+(toc?'open':'')} aria-label="책 목차"><Link className="back-link" to={'/books/'+bookId}><ArrowLeft size={16}/>책 소개</Link><h2>{book.title}</h2><p>{(progress?.readPages||[]).length} / {book.pages.length} 페이지 읽음</p><ol>{book.pages.map((p,i)=><li key={p.id}><Link aria-current={p.id===pageId?'page':undefined} to={'/books/'+bookId+'/pages/'+p.id}><span>{String(i+1).padStart(2,'0')}</span>{p.title}{progress?.readPages.includes(p.id)&&<Check size={14} aria-label="읽음"/>}</Link></li>)}</ol><Link to={'/books/'+bookId+'/about'}>이 책의 자료와 교정</Link></aside>
     <main className="reader-main" id="main"><div className="reader-toolbar"><button className="text-button mobile-toc" onClick={()=>setToc(!toc)} aria-expanded={toc}><List size={18}/>목차</button><span>{index+1} / {book.pages.length}</span><div><BookmarkButton key={bookId+'/'+pageId} bookId={bookId} pageId={pageId}/><button onClick={event=>togglePanel('dictionary',event.currentTarget)} aria-expanded={panel==='dictionary'}>사전</button><button onClick={event=>togglePanel('sources',event.currentTarget)} aria-expanded={panel==='sources'}>출처</button><button aria-label="메모" onClick={event=>togglePanel('notes',event.currentTarget)} aria-expanded={panel==='notes'}><MessageSquare size={16}/><span>메모</span></button></div></div>
       <article className="reading-paper"><header className="page-header"><Link to={'/subjects/'+book.subject}>{book.section}</Link><h1><WordText text={page.title}/></h1><p className="page-goal"><WordText text={page.goal}/></p><span className="read-time">차근차근 약 {page.minutes}분</span></header>
-        {book.subject==='japanese'&&<p className="word-help-hint">밑줄이 있는 단어를 누르면 읽기와 한자 풀이를 볼 수 있어요.</p>}
+        {book.subject==='japanese'&&<p className="word-help-hint">파란색 단어를 누르면 읽기와 한자 풀이를 볼 수 있어요.</p>}
         {page.blocks.map(block=><BlockView key={block.id+'-'+epoch} block={block} epoch={epoch} showSources={showSources}/>)}
         <footer className="page-end"><BookOpen size={30}/><h2>오늘 이해한 것을 한 문장으로 말해 보세요</h2><p>정답을 외웠는지보다, 왜 그런 표현을 쓰는지 설명할 수 있는지 확인해 보세요.</p><div className="choice-row"><button aria-pressed={progress?.readPages.includes(pageId)||false} onClick={()=>mark('readPages')}><Check size={17}/>읽음 표시</button><button aria-pressed={progress?.reviewPages.includes(pageId)||false} onClick={()=>mark('reviewPages')}>복습 표시</button></div><p className="save-status" role="status">{saveMessage}</p><p className="quiet">읽던 위치와 진도는 이 브라우저에 남아요. 문제와 이전 풀이 기록은 다시 열 때 비워져요.</p></footer>
       </article>
       <nav className="page-nav" aria-label="페이지 이동">{index>0?<Link to={'/books/'+bookId+'/pages/'+book.pages[index-1].id}><ArrowLeft size={18}/><span><small>이전</small>{book.pages[index-1].title}</span></Link>:<Link to={'/books/'+bookId}><ArrowLeft size={18}/>목차</Link>}{index<book.pages.length-1?<Link to={'/books/'+bookId+'/pages/'+book.pages[index+1].id}><span><small>다음</small>{book.pages[index+1].title}</span><ArrowRight size={18}/></Link>:<Link to={'/subjects/'+book.subject}>내부 서재로<ArrowRight size={18}/></Link>}</nav>
     </main>
     {panel&&<><div className="sheet-scrim" aria-hidden="true"/><div ref={sheetRef} tabIndex={-1} className="side-sheet" role="dialog" aria-modal={mobilePanel} aria-label={panel==='dictionary'?'한자와 어휘 사전':panel==='sources'?'출처와 보충 설명':'내 메모'}><div className="sheet-header"><h2>{panel==='dictionary'?'읽다가 궁금한 말':panel==='sources'?'자료와 보충의 구분':'내 메모'}</h2><button aria-label="도움말 닫기" onClick={()=>setPanel(null)}><X size={21}/></button></div>
-      {panel==='dictionary'&&<><label className="field-label" htmlFor="dictionary-search">단어·읽기·뜻 찾기</label><input id="dictionary-search" value={dictionaryQuery} onChange={e=>setDictionaryQuery(e.target.value)} placeholder="예: 私, わたし, 나"/><div className="dictionary-list">{book.glossary.filter(v=>(v.word+' '+v.reading+' '+v.meaning).includes(dictionaryQuery)).map(v=><details key={v.id}><summary><span lang="ja">{v.word}</span><small>{v.meaning}</small></summary><WordDefinition entry={v}/></details>)}</div></>}
+      {panel==='dictionary'&&<><label className="field-label" htmlFor="dictionary-search">단어·읽기·뜻 찾기</label><input id="dictionary-search" value={dictionaryQuery} onChange={e=>setDictionaryQuery(e.target.value)} placeholder="예: 私, わたし, 나"/><div className="dictionary-list">{dictionaryEntries.filter(v=>(v.word+' '+v.reading+' '+v.meaning).includes(dictionaryQuery)).map(v=><details key={v.id}><summary><span lang="ja">{v.word}</span><small>{v.meaning}</small></summary><WordDefinition entry={v}/></details>)}</div></>}
       {panel==='sources'&&<><p>수업 자료, 교정을 반영한 설명, 새로 만든 보충을 구분해서 읽어주세요.</p><label className="check-row"><input type="checkbox" checked={showSources} onChange={e=>setShowSources(e.target.checked)}/>본문마다 출처 표시</label><ul className="source-list">{book.sources.map(s=><li key={s.id}><strong>{s.id}</strong><span>{s.label}</span></li>)}</ul><Link to={'/books/'+bookId+'/about'}>자료 대응과 이 책 정보</Link></>}
       {panel==='notes'&&<><p>이 페이지에서 이해한 것과 아직 궁금한 것을 적어보세요. 메모는 같은 브라우저에 자동 저장돼요.</p><label className="field-label" htmlFor="reader-note">페이지 메모</label><textarea id="reader-note" rows={12} maxLength={50000} value={note} onChange={e=>updateNote(e.target.value)}/><p role="status" className="save-status">{saveMessage}</p><Link to="/settings">기록을 파일로 보관하기</Link></>}
     </div></>}

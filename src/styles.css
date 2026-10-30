@@ -3176,8 +3176,8 @@ img {
 @media(max-width:350px){.app-header .brand{font-size:14px}}
 
 /* Inline word explanations keep reading on the current page. */
-button.word-link{display:inline;min-height:0;min-width:0;padding:0;margin:0;border:0;border-radius:3px;background:transparent;color:inherit;font:inherit;line-height:inherit;letter-spacing:inherit;text-align:inherit;vertical-align:baseline;text-decoration:underline dotted #007aff8c;text-underline-offset:.2em;text-decoration-thickness:1px;box-shadow:none;white-space:inherit}
-button.word-link:hover{background:var(--wash);color:var(--accent-text)}
+button.word-link{display:inline;min-height:0;min-width:0;padding:0;margin:0;border:0;border-radius:3px;background:var(--wash);color:var(--accent-text);font:inherit;line-height:inherit;letter-spacing:inherit;text-align:inherit;vertical-align:baseline;text-decoration:underline solid currentColor;text-underline-offset:.2em;text-decoration-thickness:1px;box-shadow:none;white-space:inherit}
+button.word-link:hover{background:#dcecff;color:var(--accent-text)}
 button.word-link:active{transform:none}
 .word-help-hint{margin:0 0 28px;color:var(--muted);font-size:12px;line-height:1.8}
 .word-popover{position:fixed;inset:auto;margin:0;padding:20px;width:min(360px,calc(100vw - 24px));max-width:none;max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);box-shadow:0 8px 24px #202a3a17,0 24px 64px #202a3a14;opacity:0;transform:translateY(3px);transition:opacity 180ms var(--ease),transform 180ms var(--ease),display 180ms allow-discrete,overlay 180ms allow-discrete}

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useId, useMemo, useRef, useState, type PropsWithChildren } from 'react';
 import { X } from 'lucide-react';
+import { getWordEntries } from '../lib/word-data';
 import kanjiMeanings from '../content/japanese-kanji.json';
 import { createWordMatcher, type GlossaryEntry, type WordPart } from '../lib/words';
 
@@ -17,7 +18,7 @@ export function WordDefinition({entry}:{entry:GlossaryEntry}){
 export function WordHelpProvider({children,entries,enabled=true}:{entries:GlossaryEntry[];enabled?:boolean}&PropsWithChildren){
  const [selection,setSelection]=useState<{entry:GlossaryEntry;anchor:HTMLButtonElement}|null>(null);
  const popup=useRef<HTMLDivElement>(null),closeButton=useRef<HTMLButtonElement>(null),titleId=useId();
- const split=useMemo(()=>createWordMatcher(enabled?entries:[]),[entries,enabled]);
+ const split=useMemo(()=>createWordMatcher(enabled?getWordEntries(entries):[]),[entries,enabled]);
  const close=(restore=false)=>{popup.current?.hidePopover();if(restore&&selection?.anchor.isConnected)requestAnimationFrame(()=>selection.anchor.focus({preventScroll:true}));};
  useEffect(()=>{
   if(!selection||!popup.current)return;

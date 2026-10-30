@@ -27,3 +27,16 @@ test('표의 긴 단어와 사전에도 같은 풀이가 있고 페이지 이동
  await page.locator('.dictionary-list details').filter({has:page.locator('summary span',{hasText:/^学生$/})}).locator('summary').click();
  const entry=page.locator('.dictionary-list details[open]').first();await expect(entry.locator('dd')).toHaveText(['배울 학','날 생']);
 });
+test('누락 단어와 숫자 날짜도 분명한 파란 단어로 표시한다',async({page})=>{
+ for(const [pageId,word,reading] of [['nominal','会社員','かいしゃいん'],['hobbies','日本語','にほんご'],['dates','3日','みっか']]){
+  await page.goto('/#/books/first-sentences/pages/'+pageId);
+  const link=page.locator('.reading-paper .word-link').filter({hasText:new RegExp('^'+word+'$')}).first();await expect(link).toBeVisible();
+  const style=await link.evaluate(el=>{const css=getComputedStyle(el);return {color:css.color,background:css.backgroundColor,decoration:css.textDecorationStyle};});
+  expect(style.color).toBe('rgb(0, 99, 206)');expect(style.background).toBe('rgb(234, 243, 255)');expect(style.decoration).toBe('solid');
+  await link.click();const popup=page.getByRole('dialog',{name:word,exact:true});await expect(popup.locator('.word-reading')).toHaveText(reading);await popup.getByRole('button',{name:'단어 설명 닫기'}).click();
+ }
+ await page.getByRole('button',{name:'사전',exact:true}).click();
+ for(const [word,reading] of [['20分','にじゅっぷん'],['2000年','にせんねん']]){
+  await page.getByLabel('단어·읽기·뜻 찾기').fill(word);
+  const entry=page.locator('.dictionary-list details').filter({has:page.locator('summary span',{hasText:new RegExp('^'+word+'$')})});await entry.locator('summary').click();await expect(entry.locator('.word-reading')).toHaveText(reading);
+ }});
