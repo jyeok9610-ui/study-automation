@@ -17,3 +17,6 @@ FINISH: unreviewed and undocumented is unfinished; this build ends with the fini
 ## Preservation boundary
 
 No edits to content JSON, IDs, route paths, IndexedDB schema or storage logic. Preserve the old theme preference in storage without reading it; the visual app is fixed light. No external SDK, new runtime dependency, remote push or deployment. Capture baseline and three actual evaluation cycles at 1920×1080, 1440×900 and 390×844. Inspection rounds and findings are recorded in docs/liquid-glass-redesign.md.
+
+## Follow-up scope
+2026-10-30: The user approved a reference-led Home dashboard and real page bookmarks. The newer home-dashboard.md contract governs that extension. Bookmarks add namespaced rows and an optional backup field while preserving DB version1/stores and existing records. The original no-storage-edit boundary applies to the initial visual redesign, not this explicitly approved feature.

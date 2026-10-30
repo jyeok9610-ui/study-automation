@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowDownToLine, ArrowLeft, ArrowRight, BookOpen, Check, ChevronRight, CircleHelp, Compass, Download, Grid2X2, Library as LibraryIcon, List, Map as MapIcon, Search, Settings, Upload } from 'lucide-react';
+import { ArrowDownToLine, ArrowLeft, ArrowRight, Bookmark, ChartNoAxesColumnIncreasing, Home as HomeIcon, BookOpen, Check, ChevronRight, CircleHelp, Compass, Download, Grid2X2, Library as LibraryIcon, List, Map as MapIcon, Search, Settings, Upload } from 'lucide-react';
 import type { Book, BookSummary, Library } from './shared/schema';
 import { getBook, getLibrary } from './lib/content';
 import { exportReading, getProgress, importReading, type Progress } from './lib/storage';
 import { searchBooks } from './lib/search';
 import Reader from './components/Reader';
+import { HomeDashboard, BookmarksPage, ProgressPage } from './components/Dashboard';
 
 const bookRoute=(bookId:string,pageId?:string)=>'/books/'+bookId+(pageId?'/pages/'+pageId:'');
 function BookCover({book,large=false}:{book:Pick<BookSummary,'title'|'subtitle'|'coverColor'|'level'>;large?:boolean}) {
@@ -14,7 +15,7 @@ function BookCover({book,large=false}:{book:Pick<BookSummary,'title'|'subtitle'|
 function BookCard({book}:{book:BookSummary}) {
   return <Link className="book-card" to={bookRoute(book.id)}><BookCover book={book}/><div className="book-card-copy"><h3>{book.title}</h3><p>{book.summary}</p><span>{book.pageCount}페이지 · 차근차근 약 {book.minutes}분<ChevronRight size={15}/></span></div></Link>;
 }
-function Home({library}:{library:Library}) {
+function LibraryPage({library}:{library:Library}) {
   const [recent,setRecent]=useState<{book:BookSummary;progress:Progress}[]>([]);
   useEffect(()=>{Promise.all(library.books.map(async book=>({book,progress:await getProgress(book.id)}))).then(v=>setRecent(v.filter((x):x is {book:BookSummary;progress:Progress}=>!!x.progress).sort((a,b)=>b.progress.updatedAt-a.progress.updatedAt).slice(0,2))).catch(()=>{});},[library]);
   return <><section className="library-opening"><div className="opening-copy"><h1>궁금했던 것들을,<br/>내 책으로.</h1><p>자료를 모으는 데서 한 걸음 더.<br/>읽고, 직접 바꿔 보고, 내 말로 이해하는 서재입니다.</p><Link className="text-link" to="/paths">질문에서 시작하기<ArrowRight size={18}/></Link></div><div className="opening-note"><span className="rule"/><p>배운다는 건<br/><strong>한 번 더 펼쳐 보는 일.</strong></p><small>서재의 책은 차근차근 채워갑니다.</small></div></section>
@@ -28,7 +29,7 @@ function Subject({library}:{library:Library}) {
   const [view,setView]=useState<'shelf'|'list'>('shelf'),[level,setLevel]=useState('');
   if(!subject)return <Empty title="찾는 분야가 없어요" text="전체 서재에서 다시 골라주세요."/>;
   const all=library.books.filter(b=>b.subject===subject.id),books=all.filter(b=>!level||b.level===level);
-  return <><Link className="back-link" to="/"><ArrowLeft size={16}/>전체 서재</Link><header className="section-title"><h1>{subject.title}의 안쪽 서재</h1><p>{subject.description} 한 주제를 충분히 풀어낸 책들을 학습 순서로 이어갑니다.</p></header><div className="catalog-controls"><div className="filter-row"><button aria-pressed={!level} onClick={()=>setLevel('')}>전체</button>{[...new Set(all.map(b=>b.level))].map(v=><button key={v} aria-pressed={v===level} onClick={()=>setLevel(v)}>{v}</button>)}</div><div className="segmented view-toggle"><button aria-label="책장으로 보기" aria-pressed={view==='shelf'} onClick={()=>setView('shelf')}><Grid2X2 size={18}/></button><button aria-label="목록으로 보기" aria-pressed={view==='list'} onClick={()=>setView('list')}><List size={18}/></button></div></div>
+  return <><Link className="back-link" to="/library"><ArrowLeft size={16}/>전체 서재</Link><header className="section-title"><h1>{subject.title}의 안쪽 서재</h1><p>{subject.description} 한 주제를 충분히 풀어낸 책들을 학습 순서로 이어갑니다.</p></header><div className="catalog-controls"><div className="filter-row"><button aria-pressed={!level} onClick={()=>setLevel('')}>전체</button>{[...new Set(all.map(b=>b.level))].map(v=><button key={v} aria-pressed={v===level} onClick={()=>setLevel(v)}>{v}</button>)}</div><div className="segmented view-toggle"><button aria-label="책장으로 보기" aria-pressed={view==='shelf'} onClick={()=>setView('shelf')}><Grid2X2 size={18}/></button><button aria-label="목록으로 보기" aria-pressed={view==='list'} onClick={()=>setView('list')}><List size={18}/></button></div></div>
     {!books.length?<Empty title={all.length?'이 단계에는 아직 책이 없어요':'이 분야의 첫 책을 준비하고 있어요'} text="완성되지 않은 책을 있는 것처럼 진열하지 않아요. 지금은 일본어 서재에서 첫 학습책을 읽을 수 있어요." action={<Link className="primary-button" to="/subjects/japanese">일본어 서재 열기<ArrowRight size={17}/></Link>}/>:<div className={'catalog '+view}>{[...new Set(books.map(b=>b.section))].map(section=><section key={section}><h2>{section}</h2><div className="book-grid">{books.filter(b=>b.section===section).map(b=><BookCard key={b.id} book={b}/>)}</div></section>)}</div>}
   </>;
 }
@@ -66,10 +67,10 @@ function AboutBook() {
 }
 function ReadingSettings() {
   const [status,setStatus]=useState(''),[busy,setBusy]=useState(false);
-  const download=async()=>{setBusy(true);try{const data=await exportReading(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='서재-읽기기록-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setStatus('읽기 기록과 메모를 파일로 내보냈어요.');}catch{setStatus('기록을 내보내지 못했어요. 브라우저 저장 권한을 확인해주세요.');}finally{setBusy(false);}};
-  return <><header className="section-title"><h1>읽어온 흔적을 보관해요</h1><p>읽던 위치·진도·메모는 지금 쓰는 브라우저에 저장됩니다.</p></header><div className="settings-content"><section><Download size={28}/><h2>기록을 파일로 내보내기</h2><p>브라우저를 바꾸거나 저장 공간을 비우기 전에 보관해주세요. 문제 답·점수·과거 풀이 이력은 저장하지 않으므로 내보내기에도 포함되지 않아요.</p><button className="primary-button" disabled={busy} onClick={download}><ArrowDownToLine size={18}/>기록 내보내기</button></section><section><Upload size={28}/><h2>보관한 기록 가져오기</h2><p>이 서재에서 내보낸 JSON 파일을 골라주세요. 같은 항목은 더 최근의 기록을 유지합니다.</p><label className="secondary-button file-button"><Upload size={18}/>기록 파일 선택<input type="file" accept=".json,application/json" disabled={busy} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;setBusy(true);try{if(file.size>5*1024*1024)throw new Error('5MB 이하의 기록 파일을 골라주세요.');const result=await importReading(JSON.parse(await file.text()));setStatus('읽기 기록 '+result.progress+'개와 메모 '+result.notes+'개를 가져왔어요.');}catch(err){setStatus(err instanceof Error?err.message:'올바른 기록 파일을 선택해주세요.');}finally{setBusy(false);e.target.value='';}}}/></label></section></div><p className="settings-status" role="status">{status}</p><p className="privacy-note">개인 기록은 GitHub나 제작 PC로 전송되지 않아요. 같은 iPhone이라도 다른 브라우저에서는 별도의 기록입니다.</p></>;
+  const download=async()=>{setBusy(true);try{const data=await exportReading(),blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='서재-읽기기록-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setStatus('읽기 기록·메모·북마크를 파일로 내보냈어요.');}catch{setStatus('기록을 내보내지 못했어요. 브라우저 저장 권한을 확인해주세요.');}finally{setBusy(false);}};
+  return <><header className="section-title"><h1>읽어온 흔적을 보관해요</h1><p>읽던 위치·진도·메모·북마크는 지금 쓰는 브라우저에 저장됩니다.</p></header><div className="settings-content"><section><Download size={28}/><h2>기록을 파일로 내보내기</h2><p>브라우저를 바꾸거나 저장 공간을 비우기 전에 보관해주세요. 문제 답·점수·과거 풀이 이력은 저장하지 않으므로 내보내기에도 포함되지 않아요.</p><button className="primary-button" disabled={busy} onClick={download}><ArrowDownToLine size={18}/>기록 내보내기</button></section><section><Upload size={28}/><h2>보관한 기록 가져오기</h2><p>이 서재에서 내보낸 JSON 파일을 골라주세요. 같은 항목은 더 최근의 기록을 유지합니다.</p><label className="secondary-button file-button"><Upload size={18}/>기록 파일 선택<input type="file" accept=".json,application/json" disabled={busy} onChange={async e=>{const file=e.target.files?.[0];if(!file)return;setBusy(true);try{if(file.size>5*1024*1024)throw new Error('5MB 이하의 기록 파일을 골라주세요.');const result=await importReading(JSON.parse(await file.text()));setStatus('읽기 기록 '+result.progress+'개와 메모 '+result.notes+'개, 북마크 '+result.bookmarks+'개를 가져왔어요.');}catch(err){setStatus(err instanceof Error?err.message:'올바른 기록 파일을 선택해주세요.');}finally{setBusy(false);e.target.value='';}}}/></label></section></div><p className="settings-status" role="status">{status}</p><p className="privacy-note">개인 기록은 GitHub나 제작 PC로 전송되지 않아요. 같은 iPhone이라도 다른 브라우저에서는 별도의 기록입니다.</p></>;
 }
-function Empty({title,text,action}:{title:string;text:string;action?:React.ReactNode}){return <div className="empty-state"><BookOpen size={38}/><h2>{title}</h2><p>{text}</p>{action||<Link className="text-link" to="/">전체 서재로<ArrowRight size={17}/></Link>}</div>;}
+function Empty({title,text,action}:{title:string;text:string;action?:React.ReactNode}){return <div className="empty-state"><BookOpen size={38}/><h2>{title}</h2><p>{text}</p>{action||<Link className="text-link" to="/library">전체 서재로<ArrowRight size={17}/></Link>}</div>;}
 function Loading(){return <div className="loading" role="status">서재를 열고 있어요…</div>;}
 export default function App(){
   const [library,setLibrary]=useState<Library>(),[error,setError]=useState(''),location=useLocation();
@@ -83,23 +84,24 @@ export default function App(){
   const reading=/^\/books\/[^/]+\/pages\/[^/]+\/?$/.test(location.pathname);
   useEffect(()=>{if(!reading)window.scrollTo(0,0);},[location.key,reading]);
   const currentSubject=library?.subjects.find(s=>location.pathname==='/subjects/'+s.id);
-  const titles:Record<string,string>={search:'서재 검색',paths:'읽기 노선',map:'지식 지도',settings:'내 읽기 기록',books:'학습책'};
-  const title=reading?'학습책 읽기':currentSubject?.title||titles[location.pathname.split('/')[1]]||'전체 서재';
-  return <div className={'app '+(reading?'is-reading':'')}>
+  const titles:Record<string,string>={library:'내 서재',bookmarks:'북마크',progress:'학습 현황',search:'서재 검색',paths:'읽기 노선',map:'지식 지도',settings:'내 읽기 기록',books:'학습책'};
+  const title=reading?'학습책 읽기':currentSubject?.title||titles[location.pathname.split('/')[1]]||'홈';
+  return <div className={'app '+(reading?'is-reading':location.pathname==='/'?'is-dashboard':'')}>
     <a className="skip-link" href="#main" onClick={e=>{e.preventDefault();const main=document.getElementById('main');if(main){main.setAttribute('tabindex','-1');main.focus();main.scrollIntoView();}}}>본문으로 건너뛰기</a>
     <header className="site-header glass">
       <Link className="brand" to="/"><span className="brand-mark"><BookOpen size={23} strokeWidth={1.7} aria-hidden="true"/></span><span>나의 지식 서재</span></Link>
       <nav className="main-nav" aria-label="주 메뉴">
-        <NavLink to="/" end><LibraryIcon size={19} aria-hidden="true"/><span>서재</span></NavLink>
-        <NavLink to="/paths"><Compass size={19} aria-hidden="true"/><span>읽기 노선</span></NavLink>
-        <NavLink to="/map"><MapIcon size={19} aria-hidden="true"/><span>지식 지도</span></NavLink>
-        <NavLink to="/search"><Search size={19} aria-hidden="true"/><span>검색</span></NavLink>
+        <NavLink to="/" end><HomeIcon size={19} aria-hidden="true"/><span>홈</span></NavLink>
+        <NavLink to="/library"><LibraryIcon size={19} aria-hidden="true"/><span>내 서재</span></NavLink>
+        <NavLink to="/bookmarks"><Bookmark size={19} aria-hidden="true"/><span>북마크</span></NavLink>
+        <NavLink to="/progress"><ChartNoAxesColumnIncreasing size={19} aria-hidden="true"/><span>학습 현황</span></NavLink>
       </nav>
+      <nav className="sidebar-explore" aria-label="더 둘러보기"><NavLink to="/paths"><Compass size={18}/><span>읽기 노선</span></NavLink><NavLink to="/map"><MapIcon size={18}/><span>지식 지도</span></NavLink></nav>
       {library&&<nav className="sidebar-subjects" aria-label="분야 바로가기"><h2>나의 분야</h2>{library.subjects.map(s=><NavLink key={s.id} to={'/subjects/'+s.id}><span className="subject-dot" style={{background:s.color}}/><span>{s.title}</span><ChevronRight size={14} aria-hidden="true"/></NavLink>)}</nav>}
-      <div className="header-tools"><Link aria-label="내 읽기 기록" to="/settings"><Settings size={19} aria-hidden="true"/><span>읽기 기록 및 보관</span></Link></div>
+      <div className="header-tools"><Link className="mobile-search" aria-label="검색 화면 열기" to="/search"><Search size={19} aria-hidden="true"/></Link><Link aria-label="내 읽기 기록" to="/settings"><Settings size={19} aria-hidden="true"/><span>읽기 기록 및 보관</span></Link></div>
     </header>
-    <div className="workspace-toolbar glass"><div className="workspace-location"><LibraryIcon size={17} aria-hidden="true"/><span>나의 지식 서재</span><ChevronRight size={14} aria-hidden="true"/><strong>{title}</strong></div><Link className="toolbar-search" to="/search"><Search size={16} aria-hidden="true"/><span>서재에서 찾기</span></Link></div>
-    {error?<main className="site-content" id="main"><Empty title="서재를 불러오지 못했어요" text={error} action={<button className="primary-button" onClick={()=>window.location.reload()}>다시 열기</button>}/></main>:!library?<Loading/>:reading?<Routes><Route path="/books/:bookId/pages/:pageId" element={<Reader/>}/></Routes>:<main className="site-content" id="main"><Routes><Route path="/" element={<Home library={library}/>}/><Route path="/subjects/:subjectId" element={<Subject library={library}/>}/><Route path="/books/:bookId" element={<BookIntro/>}/><Route path="/books/:bookId/about" element={<AboutBook/>}/><Route path="/search" element={<SearchPage library={library}/>}/><Route path="/paths" element={<Paths library={library}/>}/><Route path="/paths/:pathId" element={<Paths library={library}/>}/><Route path="/map" element={<KnowledgeMap library={library}/>}/><Route path="/settings" element={<ReadingSettings/>}/><Route path="*" element={<Empty title="이 페이지는 서재에 없어요" text="아래 링크에서 다시 시작해주세요."/>}/></Routes></main>}
+    <div className="workspace-toolbar glass"><div className="workspace-location"><LibraryIcon size={17} aria-hidden="true"/><span>나의 지식 서재</span><ChevronRight size={14} aria-hidden="true"/><strong>{title}</strong></div><Link className="toolbar-search" to="/search"><Search size={16} aria-hidden="true"/><span>서재에서 찾기</span></Link>{location.pathname==='/'&&<Link className="dashboard-settings" aria-label="읽기 기록 설정" to="/settings"><Settings size={20}/></Link>}</div>
+    {error?<main className="site-content" id="main"><Empty title="서재를 불러오지 못했어요" text={error} action={<button className="primary-button" onClick={()=>window.location.reload()}>다시 열기</button>}/></main>:!library?<Loading/>:reading?<Routes><Route path="/books/:bookId/pages/:pageId" element={<Reader/>}/></Routes>:<main className="site-content" id="main"><Routes><Route path="/" element={<HomeDashboard library={library}/>}/><Route path="/library" element={<LibraryPage library={library}/>}/><Route path="/bookmarks" element={<BookmarksPage library={library}/>}/><Route path="/progress" element={<ProgressPage library={library}/>}/><Route path="/subjects/:subjectId" element={<Subject library={library}/>}/><Route path="/books/:bookId" element={<BookIntro/>}/><Route path="/books/:bookId/about" element={<AboutBook/>}/><Route path="/search" element={<SearchPage library={library}/>}/><Route path="/paths" element={<Paths library={library}/>}/><Route path="/paths/:pathId" element={<Paths library={library}/>}/><Route path="/map" element={<KnowledgeMap library={library}/>}/><Route path="/settings" element={<ReadingSettings/>}/><Route path="*" element={<Empty title="이 페이지는 서재에 없어요" text="아래 링크에서 다시 시작해주세요."/>}/></Routes></main>}
     {!reading&&<footer className="site-footer"><span>나의 지식 서재</span><p>천천히 읽고, 내 말로 이해하는 공간.</p><Link to="/settings">내 읽기 기록 보관하기</Link></footer>}
   </div>;
 }

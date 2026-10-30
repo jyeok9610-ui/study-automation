@@ -102,6 +102,20 @@ components:
     textColor: "{colors.ink}"
     rounded: "{rounded.lg}"
     padding: "44px 52px 40px"
+  home-dashboard:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.lg}"
+    padding: "44px 44px 30px"
+  bookmark-toggle:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sm}"
+    padding: "7px 12px"
+    height: "44px"
+  bookmark-toggle-saved:
+    backgroundColor: "{colors.wash}"
+    textColor: "{colors.accent-text}"
   reader-toolbar:
     backgroundColor: "{colors.glass-fill}"
     textColor: "{colors.muted}"
@@ -161,7 +175,7 @@ The user's chosen system stack serves both display and body roles. It resolves t
 
 ### Hierarchy
 
-- **Display:** the opening title uses the fluid display role with a tight line height.
+- **Display:** the subject-shelf opening title uses the fluid display role with a tight line height. Home uses a component-specific heading (see Personal Dashboard), rather than replacing this global role.
 - **Headline:** route titles use the fluid headline role; reader page titles use a separate observed range (`clamp(27px, 2.3vw, 34px)`, line height `1.45`).
 - **Title:** learning section headings use the title role. Compact section headings commonly use `20–21px`.
 - **Body:** learning paragraphs use the body role and become `16px` on mobile while retaining `1.95` line height. Introductory and supporting prose commonly uses `13–15px` with `1.85–1.9` line height.
@@ -175,6 +189,8 @@ Headings preserve Korean word groups, allow emergency wrapping and use balanced 
 ## Layout
 
 The desktop shell reserves a rail (`252px`) for an inset sidebar (`220px` wide, `16px` from the viewport edges). The route toolbar is sticky above the workspace. Standard content is centered within `1320px`, with desktop padding of `32px 48px 72px`. Repeated gaps and padding use the frontmatter spacing steps; the layout is deliberately less dense than the surrounding controls.
+
+Home centers one opaque white dashboard panel within the existing shell. It is capped at `920px`, with `44px 44px 30px` internal padding. Two equal stat tiles remain side by side; recent-reading rows and quiet shortcuts sit below. At the mobile breakpoint the panel uses `28px 24px 20px` padding, smaller type and tighter gaps, while keeping the two stat tiles. This is the Home surface composition; other routes retain their own layout.
 
 The subject shelf has four equal columns. The catalog uses three columns and retains recognizable book covers. Reader layout combines a `220px` sticky contents column, a `28px` gap and a reading column up to `840px`; the opaque paper's internal padding narrows the actual text measure.
 
@@ -232,11 +248,23 @@ White fields use the small radius, `11px 14px` padding, a clear neutral stroke a
 
 ### Navigation
 
-The sidebar uses muted labels with icons, white selected rows and Readable Blue active labels. Subject links retain small data-colored dots. The mobile dock preserves the four existing destinations and pairs each icon with its text label. Settings remains accessible in the top brand area.
+The sidebar uses muted labels with icons, white selected rows and Readable Blue active labels. Subject links retain small data-colored dots. The sidebar and mobile dock share four primary destinations: Home (`홈`), My Library (`내 서재`), Bookmarks (`북마크`) and Learning Progress (`학습 현황`). Each destination pairs an icon with a text label. The original subject shelf lives at My Library; paths, map and search remain available through exploration links and existing library entry points. Home reduces the desktop chrome to the primary destinations and quiet search/settings icons. Mobile keeps search and settings in the top brand area.
 
 ### Reader Toolbar and Helper Sheets
 
 The sticky reader toolbar is a compact glass group outside the paper. Active helper controls become white with blue text. The sheet is more opaque than the sidebar, scrolls internally, has a clearly visible close button and retains white input surfaces. Mobile uses the existing dialog and scrim behavior. Closing a helper preserves the reading and activity context.
+
+### Personal Dashboard
+
+A generous white panel extends the existing material language. Quiet Workspace Mist stat tiles, document icons, separated text rows and restrained chevrons keep the focus on real reading activity. The Home heading uses the platform stack with component-specific typography (`40px`, weight `700`, line height `1.3`, tracking `-.04em`; mobile `30px`). Stat numerals use tabular figures (`46px`, weight `650`, line height `1.15`; mobile `37px`). These roles do not change the shared display or reading scale.
+
+Recent-reading links use a document icon, book title, supporting reading position and a trailing chevron. With no reading activity, the same list presents actual published books under “처음 펼쳐볼 자료”. Empty, loading and storage-error states use clear text in the existing system; the reference image's illustrative counts and book names are not interface data. Detailed composition and data scope remain in `.impeccable/surfaces/home-dashboard.md`.
+
+### Page Bookmarks and Reading Progress
+
+The reader's page bookmark is a toggle in the existing glass toolbar. A saved state uses Blue Wash, Readable Blue and a filled bookmark icon; its accessible pressed state and label communicate the same result. The hit area remains at least `44px`; mobile hides the visible label while retaining an accessible label. A storage error appears beside the control in an opaque notice.
+
+The bookmark collection uses an opaque white list with quiet dividers, document/bookmark icons, page titles and supporting book text. A separate `44px` remove control has a restrained error-colored hover. Empty and failure states explain what to do next. Reading Progress uses white book groups, thin blue progress bars, tabular percentages and explicit “읽음” / “읽기 전” labels beside the read indicators. Progress describes pages marked read; it does not imply saved answers, scores or exam history.
 
 ## Do's and Don'ts
 

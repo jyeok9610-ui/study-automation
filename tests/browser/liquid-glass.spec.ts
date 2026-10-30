@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test('Light Mode stays fixed without deleting an old theme preference',async({page})=>{
  await page.emulateMedia({colorScheme:'dark',reducedMotion:'reduce'});
  await page.goto('/');await page.evaluate(()=>localStorage.setItem('library-theme','dark'));await page.reload();
- await expect(page.locator('.subject-book').first()).toBeVisible();
+ await expect(page.locator('.dashboard-panel')).toBeVisible();
  expect(await page.locator('html').getAttribute('data-theme')).toBe('light');
  expect(await page.evaluate(()=>getComputedStyle(document.documentElement).colorScheme)).toBe('light');
  expect(await page.evaluate(()=>localStorage.getItem('library-theme'))).toBe('dark');
@@ -11,13 +11,14 @@ test('Light Mode stays fixed without deleting an old theme preference',async({pa
 });
 
 test('Navigation stays in the viewport and leaves the mobile brand clear',async({page,isMobile})=>{
- await page.goto('/');await expect(page.locator('.subject-book').first()).toBeVisible();
+ await page.goto('/');await expect(page.locator('.dashboard-panel')).toBeVisible();
  const nav=await page.locator('.main-nav').boundingBox();expect(nav).not.toBeNull();
  if(isMobile){
   const viewport=page.viewportSize()!;expect(nav!.y).toBeGreaterThan(viewport.height-110);expect(nav!.y+nav!.height).toBeLessThanOrEqual(viewport.height);
   const brand=await page.locator('.brand').boundingBox();expect(brand!.y+brand!.height).toBeLessThan(nav!.y);
  }
- await page.getByRole('navigation',{name:'주 메뉴'}).getByRole('link',{name:'지식 지도',exact:true}).click();
+ await page.getByRole('navigation',{name:'주 메뉴'}).getByRole('link',{name:'내 서재',exact:true}).click();
+ await page.goto('/#/map');
  await expect(page.locator('.concept-panel')).toBeVisible();
  const dimensions=await page.evaluate(()=>({inner:innerWidth,scroll:document.documentElement.scrollWidth}));
  expect(dimensions.inner).toBe(page.viewportSize()!.width);expect(dimensions.scroll).toBeLessThanOrEqual(page.viewportSize()!.width+1);

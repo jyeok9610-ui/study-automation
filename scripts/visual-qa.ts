@@ -9,7 +9,10 @@ const base=process.env.QA_BASE_URL||'http://127.0.0.1:4173';
 const browser=await chromium.launch();
 const reports:unknown[]=[];
 const routes=[
- ['home','/','.subject-book'],
+ ['home','/','.dashboard-panel'],
+ ['library','/#/library','.subject-book'],
+ ['bookmarks','/#/bookmarks','.empty-state'],
+ ['progress','/#/progress','.progress-books'],
  ['subject','/#/subjects/japanese','.book-card'],
  ['intro','/#/books/first-sentences','.chapter-list'],
  ['reader','/#/books/first-sentences/pages/nominal','.page-header h1'],
@@ -40,6 +43,15 @@ try{
   await page.screenshot({path:path.join(folder,device+'-panel.png'),animations:'disabled'});
   await page.keyboard.press('Escape');
   if(round!=='before'){
+   await page.goto(base+'/#/books/first-sentences/pages/nominal');await page.locator('.page-header').waitFor();
+   await page.getByRole('button',{name:'북마크 추가',exact:true}).click();await page.getByRole('button',{name:'북마크 해제',exact:true}).waitFor();
+   await page.getByRole('button',{name:'읽음 표시',exact:true}).click();
+   await page.goto(base+'/');await page.getByText('13%',{exact:true}).waitFor();await page.screenshot({path:path.join(folder,device+'-home-with-progress.png'),animations:'disabled'});
+   await page.goto(base+'/#/bookmarks');await page.locator('.bookmark-item').waitFor();await page.screenshot({path:path.join(folder,device+'-saved-bookmark.png'),animations:'disabled'});
+   await page.goto(base+'/#/progress');await page.locator('.read-indicator.is-read').waitFor();await page.screenshot({path:path.join(folder,device+'-reading-progress.png'),animations:'disabled'});
+   reports.push({device,route:'saved-reading',percent:'13%',bookmarks:1,errors:[...new Set(errors)]});errors.length=0;
+  }
+  if(round!=='before'){
    await page.goto(base+'/#/books/first-sentences/pages/nominal');await page.locator('.page-header').waitFor();await page.evaluate(()=>scrollTo(0,350));await page.waitForTimeout(320);
    reports.push({device,route:'scrolled',active:await page.locator('html').getAttribute('data-scrolled')});
    await page.emulateMedia({colorScheme:'dark',reducedMotion:'reduce'});
@@ -51,5 +63,5 @@ try{
 }finally{await browser.close();}
 fs.writeFileSync(path.join(folder,'report.json'),JSON.stringify(reports,null,2));
 const bad=reports.filter((r:any)=>r.scrollWidth>r.expectedWidth+1||r.width>r.expectedWidth+1||r.errors?.length);
-console.log(JSON.stringify({round,folder,captures:42,pages:reports.length,issues:bad},null,2));
+console.log(JSON.stringify({round,folder,captures:fs.readdirSync(folder).filter(name=>name.endsWith('.png')).length,pages:reports.length,issues:bad},null,2));
 if(bad.length)process.exitCode=1;

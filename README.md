@@ -26,3 +26,5 @@ CODEX_EXE는 설치된 codex 절대 경로, ASIDE_EXE는 공식 Aside CLI 경로
 ## 디자인과 시각 검증
 
 Light Mode UI와 스킬 검토·스크린샷·3차 QA·배포 절차는 [Liquid Glass 리디자인 기록](docs/liquid-glass-redesign.md)을 참고하세요. 로컬 서버 실행 후 `npm run visual:qa -- final`로 세 해상도 캡처를 다시 만들 수 있습니다.
+
+홈 대시보드와 페이지 북마크·기존 백업 호환 검증은 [홈·북마크 확장 기록](docs/home-dashboard.md)을 참고하세요.

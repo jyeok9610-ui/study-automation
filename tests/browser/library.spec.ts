@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 test('분야·내부 책·목차·빈 분야·검색·노선·지도를 실제로 이동한다',async({page})=>{
- await page.goto('/');await expect(page.getByRole('heading',{name:'어떤 세계를 펼쳐볼까요?'})).toBeVisible();
+ await page.goto('/#/library');await expect(page.getByRole('heading',{name:'어떤 세계를 펼쳐볼까요?'})).toBeVisible();
  await page.locator('.subject-book').filter({has:page.getByRole('heading',{name:'일본어',exact:true})}).click();
  await expect(page.getByRole('heading',{name:'일본어의 안쪽 서재'})).toBeVisible();
  await page.getByRole('link',{name:/나를 소개하고 주변을 말하는 첫 문장/}).first().click();

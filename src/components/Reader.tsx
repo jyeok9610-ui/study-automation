@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, List, MessageSquar
 import type { Block, Book } from '../shared/schema';
 import { getBook } from '../lib/content';
 import { getNotes, getProgress, saveNote, saveProgress, type Progress } from '../lib/storage';
+import BookmarkButton from './BookmarkButton';
 import { CounterLab, DialogueLab, PositionLab, ResetButton, SentenceLab } from './Widgets';
 
 function QuestionCard({block}:{block:Block}) {
@@ -88,12 +89,12 @@ export default function Reader() {
     try{await saveProgress(next);setSaveMessage(field==='readPages'?'읽음 표시를 저장했어요.':'복습 표시를 저장했어요.');}catch{setSaveMessage('기록을 저장하지 못했어요.');}
   };
   const updateNote=(text:string)=>{setNote(text);saveNote({id:bookId+'/'+pageId,bookId,pageId,text,updatedAt:Date.now()}).then(()=>setSaveMessage('메모를 저장했어요.')).catch(()=>setSaveMessage('메모를 저장하지 못했어요.'));};
-  if(error)return <div className="empty-state"><h1>책을 열지 못했어요</h1><p>{error}</p><Link to="/">서재로 돌아가기</Link></div>;
+  if(error)return <div className="empty-state"><h1>책을 열지 못했어요</h1><p>{error}</p><Link to="/library">서재로 돌아가기</Link></div>;
   if(!book)return <div className="loading" role="status">책을 펼치고 있어요…</div>;
   if(!page)return <div className="empty-state"><h1>이 페이지를 찾지 못했어요</h1><p>책의 목차에서 읽을 곳을 다시 골라주세요.</p><Link to={'/books/'+bookId}>목차로</Link></div>;
   return <div className="reader-layout">
     <aside className={'toc '+(toc?'open':'')} aria-label="책 목차"><Link className="back-link" to={'/books/'+bookId}><ArrowLeft size={16}/>책 소개</Link><h2>{book.title}</h2><p>{(progress?.readPages||[]).length} / {book.pages.length} 페이지 읽음</p><ol>{book.pages.map((p,i)=><li key={p.id}><Link aria-current={p.id===pageId?'page':undefined} to={'/books/'+bookId+'/pages/'+p.id}><span>{String(i+1).padStart(2,'0')}</span>{p.title}{progress?.readPages.includes(p.id)&&<Check size={14} aria-label="읽음"/>}</Link></li>)}</ol><Link to={'/books/'+bookId+'/about'}>이 책의 자료와 교정</Link></aside>
-    <main className="reader-main" id="main"><div className="reader-toolbar"><button className="text-button mobile-toc" onClick={()=>setToc(!toc)} aria-expanded={toc}><List size={18}/>목차</button><span>{index+1} / {book.pages.length}</span><div><button onClick={()=>togglePanel('dictionary')} aria-expanded={panel==='dictionary'}>사전</button><button onClick={()=>togglePanel('sources')} aria-expanded={panel==='sources'}>출처</button><button aria-label="메모" onClick={()=>togglePanel('notes')} aria-expanded={panel==='notes'}><MessageSquare size={16}/><span>메모</span></button></div></div>
+    <main className="reader-main" id="main"><div className="reader-toolbar"><button className="text-button mobile-toc" onClick={()=>setToc(!toc)} aria-expanded={toc}><List size={18}/>목차</button><span>{index+1} / {book.pages.length}</span><div><BookmarkButton key={bookId+'/'+pageId} bookId={bookId} pageId={pageId}/><button onClick={()=>togglePanel('dictionary')} aria-expanded={panel==='dictionary'}>사전</button><button onClick={()=>togglePanel('sources')} aria-expanded={panel==='sources'}>출처</button><button aria-label="메모" onClick={()=>togglePanel('notes')} aria-expanded={panel==='notes'}><MessageSquare size={16}/><span>메모</span></button></div></div>
       <article className="reading-paper"><header className="page-header"><Link to={'/subjects/'+book.subject}>{book.section}</Link><h1>{page.title}</h1><p className="page-goal">{page.goal}</p><span className="read-time">차근차근 약 {page.minutes}분</span></header>
         {page.blocks.map(block=><BlockView key={block.id+'-'+epoch} block={block} epoch={epoch} showSources={showSources}/>)}
         <footer className="page-end"><BookOpen size={30}/><h2>오늘 이해한 것을 한 문장으로 말해 보세요</h2><p>정답을 외웠는지보다, 왜 그런 표현을 쓰는지 설명할 수 있는지 확인해 보세요.</p><div className="choice-row"><button aria-pressed={progress?.readPages.includes(pageId)||false} onClick={()=>mark('readPages')}><Check size={17}/>읽음 표시</button><button aria-pressed={progress?.reviewPages.includes(pageId)||false} onClick={()=>mark('reviewPages')}>복습 표시</button></div><p className="save-status" role="status">{saveMessage}</p><p className="quiet">읽던 위치와 진도는 이 브라우저에 남아요. 문제와 이전 풀이 기록은 다시 열 때 비워져요.</p></footer>
