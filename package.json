@@ -9,6 +9,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "tsx --test tests/*.test.ts",
     "e2e": "playwright test",
+    "visual:qa": "tsx scripts/visual-qa.ts",
     "studio": "tsx studio/server.ts",
     "seed": "tsx scripts/seed.ts",
     "validate": "tsx scripts/validate-content.ts",

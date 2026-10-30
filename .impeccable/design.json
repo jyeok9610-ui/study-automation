@@ -1,0 +1,385 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-30T02:14:04.387Z",
+  "title": "Design System: 나의 지식 서재",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Workspace Mist",
+        "tonalRamp": [
+          "oklch(15% 0.005 270)",
+          "oklch(26% 0.005 270)",
+          "oklch(37% 0.005 270)",
+          "oklch(49% 0.005 270)",
+          "oklch(61% 0.005 270)",
+          "oklch(73% 0.005 270)",
+          "oklch(85% 0.005 270)",
+          "oklch(95% 0.005 270)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Reading White",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(26% 0 0)",
+          "oklch(37% 0 0)",
+          "oklch(49% 0 0)",
+          "oklch(61% 0 0)",
+          "oklch(73% 0 0)",
+          "oklch(85% 0 0)",
+          "oklch(95% 0 0)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Graphite Ink",
+        "tonalRamp": [
+          "oklch(15% 0.005 270)",
+          "oklch(26% 0.005 270)",
+          "oklch(37% 0.005 270)",
+          "oklch(49% 0.005 270)",
+          "oklch(61% 0.005 270)",
+          "oklch(73% 0.005 270)",
+          "oklch(85% 0.005 270)",
+          "oklch(95% 0.005 270)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Quiet Graphite",
+        "tonalRamp": [
+          "oklch(15% 0.008 280)",
+          "oklch(26% 0.008 280)",
+          "oklch(37% 0.008 280)",
+          "oklch(49% 0.008 280)",
+          "oklch(61% 0.008 280)",
+          "oklch(73% 0.008 280)",
+          "oklch(85% 0.008 280)",
+          "oklch(95% 0.008 280)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "System Blue",
+        "tonalRamp": [
+          "oklch(15% 0.2 255)",
+          "oklch(26% 0.2 255)",
+          "oklch(37% 0.2 255)",
+          "oklch(49% 0.2 255)",
+          "oklch(61% 0.2 255)",
+          "oklch(73% 0.2 255)",
+          "oklch(85% 0.2 255)",
+          "oklch(95% 0.2 255)"
+        ]
+      },
+      "accent-text": {
+        "role": "primary",
+        "displayName": "Readable Blue",
+        "tonalRamp": [
+          "oklch(15% 0.18 255)",
+          "oklch(26% 0.18 255)",
+          "oklch(37% 0.18 255)",
+          "oklch(49% 0.18 255)",
+          "oklch(61% 0.18 255)",
+          "oklch(73% 0.18 255)",
+          "oklch(85% 0.18 255)",
+          "oklch(95% 0.18 255)"
+        ]
+      },
+      "accent-strong": {
+        "role": "primary",
+        "displayName": "Action Blue",
+        "tonalRamp": [
+          "oklch(15% 0.19 255)",
+          "oklch(26% 0.19 255)",
+          "oklch(37% 0.19 255)",
+          "oklch(49% 0.19 255)",
+          "oklch(61% 0.19 255)",
+          "oklch(73% 0.19 255)",
+          "oklch(85% 0.19 255)",
+          "oklch(95% 0.19 255)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Soft Divider",
+        "tonalRamp": [
+          "oklch(15% 0.007 280)",
+          "oklch(26% 0.007 280)",
+          "oklch(37% 0.007 280)",
+          "oklch(49% 0.007 280)",
+          "oklch(61% 0.007 280)",
+          "oklch(73% 0.007 280)",
+          "oklch(85% 0.007 280)",
+          "oklch(95% 0.007 280)"
+        ]
+      },
+      "wash": {
+        "role": "neutral",
+        "displayName": "Blue Wash",
+        "tonalRamp": [
+          "oklch(15% 0.025 255)",
+          "oklch(26% 0.025 255)",
+          "oklch(37% 0.025 255)",
+          "oklch(49% 0.025 255)",
+          "oklch(61% 0.025 255)",
+          "oklch(73% 0.025 255)",
+          "oklch(85% 0.025 255)",
+          "oklch(95% 0.025 255)"
+        ]
+      },
+      "error": {
+        "role": "secondary",
+        "displayName": "Error Red",
+        "tonalRamp": [
+          "oklch(15% 0.16 20)",
+          "oklch(26% 0.16 20)",
+          "oklch(37% 0.16 20)",
+          "oklch(49% 0.16 20)",
+          "oklch(61% 0.16 20)",
+          "oklch(73% 0.16 20)",
+          "oklch(85% 0.16 20)",
+          "oklch(95% 0.16 20)"
+        ]
+      },
+      "correct": {
+        "role": "secondary",
+        "displayName": "Correct Green",
+        "tonalRamp": [
+          "oklch(15% 0.1 155)",
+          "oklch(26% 0.1 155)",
+          "oklch(37% 0.1 155)",
+          "oklch(49% 0.1 155)",
+          "oklch(61% 0.1 155)",
+          "oklch(73% 0.1 155)",
+          "oklch(85% 0.1 155)",
+          "oklch(95% 0.1 155)"
+        ]
+      },
+      "glass-fill": {
+        "role": "neutral",
+        "displayName": "Glass Fill",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(26% 0 0)",
+          "oklch(37% 0 0)",
+          "oklch(49% 0 0)",
+          "oklch(61% 0 0)",
+          "oklch(73% 0 0)",
+          "oklch(85% 0 0)",
+          "oklch(95% 0 0)"
+        ]
+      },
+      "glass-border": {
+        "role": "neutral",
+        "displayName": "Reflected Edge",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(26% 0 0)",
+          "oklch(37% 0 0)",
+          "oklch(49% 0 0)",
+          "oklch(61% 0 0)",
+          "oklch(73% 0 0)",
+          "oklch(85% 0 0)",
+          "oklch(95% 0 0)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Opening title."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Route titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Learning section headings."
+      },
+      "body": {
+        "displayName": "Reading Body",
+        "purpose": "Long learning paragraphs; 16px on mobile."
+      },
+      "label": {
+        "displayName": "Action Label",
+        "purpose": "Primary and secondary control labels."
+      }
+    },
+    "shadows": [
+      {
+        "name": "ambient-surface",
+        "value": "0 2px 5px #18233808,0 12px 32px #18233812",
+        "purpose": "Shared low diffuse lift."
+      },
+      {
+        "name": "glass-chrome",
+        "value": "inset 0 1px 0 #fffffff5,inset 0 -1px 0 #ffffff73,0 2px 6px #232d4608,0 16px 44px #232d4612",
+        "purpose": "Reflected edges and ambient depth for glass chrome."
+      },
+      {
+        "name": "helper-sheet",
+        "value": "inset 0 1px 0 white,0 6px 18px #152a4610,0 24px 70px #152a4626",
+        "purpose": "Helper overlay above the reader."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.2,.7,.2,1)",
+        "purpose": "Shared state and panel easing."
+      },
+      {
+        "name": "motion-fast",
+        "value": "140ms",
+        "purpose": "Base button and control transitions."
+      },
+      {
+        "name": "navigation-state",
+        "value": "180ms",
+        "purpose": "Navigation and primary/secondary action transitions."
+      },
+      {
+        "name": "scroll-depth",
+        "value": "220ms",
+        "purpose": "Toolbar opacity, edge and shadow transitions."
+      },
+      {
+        "name": "motion-panel",
+        "value": "240ms",
+        "purpose": "Helper sheet entrance."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "compact-desktop",
+        "value": "1240px"
+      },
+      {
+        "name": "single-reader",
+        "value": "1080px"
+      },
+      {
+        "name": "mobile",
+        "value": "760px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Main reading or navigation action.",
+      "html": "<button class=\"ds-btn-primary\">공부 시작하기</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;border-radius:var(--radius-sm,12px);padding:11px 18px;font-family:system-ui, -apple-system, BlinkMacSystemFont, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif;font-size:13px;font-weight:600;line-height:1.6;cursor:pointer;transition:background 180ms cubic-bezier(.2,.7,.2,1),box-shadow 180ms cubic-bezier(.2,.7,.2,1),transform 100ms;background:var(--accent-strong,#0068d9);color:var(--surface,#fff);border:1px solid transparent;box-shadow:0 2px 4px #007aff16,inset 0 1px 0 #ffffff26}.ds-btn-primary:hover{background:#005dc8;box-shadow:0 4px 10px #007aff24}.ds-btn-primary:focus-visible { outline:3px solid var(--accent,#007aff); outline-offset:4px; }.ds-btn-primary:active{transform:translateY(1px)}.ds-btn-primary:disabled{opacity:.45;cursor:default;transform:none}@media(prefers-reduced-motion:reduce){.ds-btn-primary{transition:none}}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Alternative action on an opaque white control.",
+      "html": "<button class=\"ds-btn-secondary\">책 소개 보기</button>",
+      "css": ".ds-btn-secondary{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;border-radius:var(--radius-sm,12px);padding:11px 18px;font-family:system-ui, -apple-system, BlinkMacSystemFont, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif;font-size:13px;font-weight:600;line-height:1.6;cursor:pointer;transition:background 180ms cubic-bezier(.2,.7,.2,1),box-shadow 180ms cubic-bezier(.2,.7,.2,1),transform 100ms;background:var(--surface,#fff);color:var(--accent-text,#0063ce);border:1px solid var(--line,#dedee3)}.ds-btn-secondary:hover{background:#f0f6ff}.ds-btn-secondary:focus-visible { outline:3px solid var(--accent,#007aff); outline-offset:4px; }.ds-btn-secondary:active{transform:translateY(1px)}.ds-btn-secondary:disabled{opacity:.45;cursor:default;transform:none}@media(prefers-reduced-motion:reduce){.ds-btn-secondary{transition:none}}"
+    },
+    {
+      "name": "Text Button",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Low-emphasis inline helper action.",
+      "html": "<button class=\"ds-btn-text\">설명 펼치기</button>",
+      "css": ".ds-btn-text{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;border-radius:var(--radius-sm,12px);padding:11px 18px;font-family:system-ui, -apple-system, BlinkMacSystemFont, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif;font-size:13px;font-weight:600;line-height:1.6;cursor:pointer;transition:background 180ms cubic-bezier(.2,.7,.2,1),box-shadow 180ms cubic-bezier(.2,.7,.2,1),transform 100ms;gap:6px;padding:8px 10px;background:transparent;border:1px solid transparent;color:var(--accent-text,#0063ce);font-weight:400;font-size:16px}.ds-btn-text:hover{background:var(--wash,#eaf3ff)}.ds-btn-text:focus-visible { outline:3px solid var(--accent,#007aff); outline-offset:4px; }.ds-btn-text:active{transform:translateY(1px)}@media(prefers-reduced-motion:reduce){.ds-btn-text{transition:none}}"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Opaque field for helper search or note input.",
+      "html": "<input class=\"ds-input\" type=\"text\" aria-label=\"단어 찾기\" placeholder=\"단어 찾기\">",
+      "css": ".ds-input{min-width:0;max-width:100%;border:1px solid #b9bdc7;border-radius:var(--radius-sm,12px);padding:11px 14px;background:var(--surface,#fff);color:var(--ink,#1d1d1f);caret-color:var(--accent,#007aff);font-family:system-ui, -apple-system, BlinkMacSystemFont, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif;font-size:16px;line-height:1.6}.ds-input::placeholder{color:var(--muted,#6e6e73);opacity:1}.ds-input:hover{border-color:#b9bdc7}.ds-input:focus-visible { outline:3px solid var(--accent,#007aff); outline-offset:4px; }"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "navigation-item",
+      "description": "Icon and label navigation with a white selected row.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"주 메뉴\"><a class=\"ds-nav-link\" href=\"#\" aria-current=\"page\"><svg width=\"19\" height=\"19\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" aria-hidden=\"true\"><path d=\"M4 4h4v16H4zM11 4h4v16h-4zM18 4l4 15\"/></svg><span>서재</span></a><a class=\"ds-nav-link\" href=\"#\">읽기 노선</a></nav>",
+      "css": ".ds-nav{display:grid;gap:5px;padding:14px;border-radius:var(--radius-lg,24px);background:linear-gradient(155deg,#ffffffd9,#edf2faa6);border:1px solid var(--glass-border,rgb(255 255 255 / 88%));box-shadow:var(--glass-shadow,inset 0 1px 0 #fffffff5,inset 0 -1px 0 #ffffff73,0 2px 6px #232d4608,0 16px 44px #232d4612);backdrop-filter:blur(24px) saturate(155%);-webkit-backdrop-filter:blur(24px) saturate(155%)}.ds-nav-link{display:flex;align-items:center;gap:12px;min-height:46px;padding:11px 14px;border-radius:12px;color:#565963;text-decoration:none;font-family:system-ui, -apple-system, BlinkMacSystemFont, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif;font-size:14px;font-weight:550;transition:background 180ms cubic-bezier(.2,.7,.2,1),color 180ms cubic-bezier(.2,.7,.2,1)}.ds-nav-link:hover{background:#ffffff70;color:var(--ink,#1d1d1f)}.ds-nav-link[aria-current=page]{background:#fffffff2;color:var(--accent-text,#0063ce);box-shadow:0 1px 2px #16233b08,0 3px 9px #16233b08,inset 0 1px 0 #fff}.ds-nav-link:focus-visible { outline:3px solid var(--accent,#007aff); outline-offset:4px; }@media(prefers-reduced-transparency:reduce),(prefers-contrast:more){.ds-nav{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}}@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.ds-nav{background:#fff}}@media(prefers-reduced-motion:reduce){.ds-nav-link{transition:none}}"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "filter-chip",
+      "description": "Wrapping catalog filter with a raised selected state.",
+      "html": "<div class=\"ds-filters\"><button class=\"ds-chip\" aria-pressed=\"true\">전체</button><button class=\"ds-chip\" aria-pressed=\"false\">일본어</button></div>",
+      "css": ".ds-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ds-chip{min-height:44px;padding:8px 16px;border:1px solid transparent;border-radius:var(--radius-sm,12px);background:transparent;color:var(--ink,#1d1d1f);font-family:system-ui, -apple-system, BlinkMacSystemFont, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif;font-size:13px;line-height:1.6;cursor:pointer;transition:background 140ms cubic-bezier(.2,.7,.2,1),transform 100ms}.ds-chip:hover{background:#f0f4f9}.ds-chip[aria-pressed=true]{background:var(--surface,#fff);color:var(--accent-text,#0063ce);box-shadow:0 2px 6px #18233808}.ds-chip:focus-visible { outline:3px solid var(--accent,#007aff); outline-offset:4px; }.ds-chip:active{transform:translateY(1px)}@media(prefers-reduced-motion:reduce){.ds-chip{transition:none}}"
+    },
+    {
+      "name": "Reading Paper",
+      "kind": "card",
+      "refersTo": "reading-paper",
+      "description": "Opaque article container; glass remains outside the learning text.",
+      "html": "<article class=\"ds-paper\"><h2 class=\"ds-paper-title\">상황부터 떠올려 주세요</h2><p class=\"ds-paper-body\">차분히 읽고, 내 말로 이해하는 공간입니다.</p></article>",
+      "css": ".ds-paper{padding:44px 52px 40px;background:var(--surface,#fff);border-radius:var(--radius-lg,24px);color:var(--ink,#1d1d1f);font-family:system-ui, -apple-system, BlinkMacSystemFont, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif}.ds-paper-title{font-size:23px;font-weight:650;line-height:1.4;letter-spacing:-.025em;margin:0 0 18px;word-break:keep-all;overflow-wrap:anywhere}.ds-paper-body{margin:14px 0;font-size:17px;font-weight:400;line-height:1.95;color:#32363d;word-break:keep-all;overflow-wrap:anywhere}@media(max-width:760px){.ds-paper{padding:28px 22px 24px;border-radius:20px}.ds-paper-title{font-size:21px}.ds-paper-body{font-size:16px}}"
+    },
+    {
+      "name": "Reader Toolbar",
+      "kind": "custom",
+      "refersTo": "reader-toolbar",
+      "description": "Glassy helper group outside the opaque article.",
+      "html": "<div class=\"ds-reader-tools\"><span class=\"ds-reader-count\">1 / 8</span><div class=\"ds-reader-actions\"><button class=\"ds-reader-action\" aria-expanded=\"false\">사전</button><button class=\"ds-reader-action\" aria-expanded=\"true\">메모</button></div></div>",
+      "css": ".ds-reader-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px;padding:6px 12px 6px 22px;border-radius:var(--radius-md,16px);background:var(--glass-fill,rgb(255 255 255 / 64%));border:1px solid var(--glass-border,rgb(255 255 255 / 88%));box-shadow:var(--glass-shadow,inset 0 1px 0 #fffffff5,inset 0 -1px 0 #ffffff73,0 2px 6px #232d4608,0 16px 44px #232d4612);backdrop-filter:blur(24px) saturate(155%);-webkit-backdrop-filter:blur(24px) saturate(155%);font-family:system-ui, -apple-system, BlinkMacSystemFont, \"Apple SD Gothic Neo\", \"Malgun Gothic\", sans-serif}.ds-reader-count{font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted,#6e6e73)}.ds-reader-actions{display:flex;gap:4px}.ds-reader-action{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:8px 12px;border:1px solid transparent;border-radius:var(--radius-sm,12px);background:transparent;color:var(--ink,#1d1d1f);font:inherit;font-size:12px;cursor:pointer;transition:background 140ms cubic-bezier(.2,.7,.2,1),transform 100ms}.ds-reader-action:hover{background:#ffffffad}.ds-reader-action[aria-expanded=true]{background:white;color:var(--accent-text,#0063ce);box-shadow:0 1px 4px #1823380a}.ds-reader-action:focus-visible { outline:3px solid var(--accent,#007aff); outline-offset:4px; }.ds-reader-action:active{transform:translateY(1px)}@media(max-width:760px){.ds-reader-tools{padding:5px 8px;gap:6px;min-height:54px;border-radius:15px}.ds-reader-action{min-height:44px;padding:8px 9px}}@media(prefers-reduced-transparency:reduce),(prefers-contrast:more){.ds-reader-tools{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none}}@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.ds-reader-tools{background:#fff}}@media(prefers-reduced-motion:reduce){.ds-reader-action{transition:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "A macOS learning library",
+    "overview": "A light, quiet workspace gives each subject its own book identity while keeping the controls familiar. System typography, cool neutral surroundings, white content and restrained blue actions follow the user's Apple macOS / Liquid Glass direction.\n\nTranslucency belongs to the navigation and helper layer. The sidebar, toolbars, mobile dock and helper sheets use reflected edges and soft depth; article text sits on opaque white paper. The reading surface remains calm through long explanations, Japanese examples and interactive exercises.",
+    "keyCharacteristics": [
+      "Light-only workspace with opaque white reading content.",
+      "System fonts throughout the shell and reading experience.",
+      "Blue actions and selected states; preserved subject colors identify books.",
+      "Restrained glass navigation with accessible opaque fallbacks.",
+      "Compact controls around a generously spaced reading column."
+    ],
+    "rules": [
+      {
+        "name": "The Reading Paper Rule",
+        "body": "Article text uses an opaque white surface. Glass belongs to navigation, toolbars and helper overlays.",
+        "section": "colors"
+      },
+      {
+        "name": "The Single Interface Accent Rule",
+        "body": "Use blue for interface actions and selected states; retain subject colors for their existing content identities.",
+        "section": "colors"
+      },
+      {
+        "name": "The Platform Type Rule",
+        "body": "Continue the approved system font stack in new surfaces, including headings.",
+        "section": "typography"
+      },
+      {
+        "name": "The Scroll Depth Rule",
+        "body": "After the window scroll exceeds `16px`, the route toolbar gains opacity, a lower edge and a diffuse shadow; the mobile top chrome similarly becomes more opaque.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep article text on opaque white paper.",
+      "Do use the approved system font stack throughout.",
+      "Do reserve glass for navigation, toolbars and helper overlays.",
+      "Do preserve subject-colored book identities and existing semantic feedback colors.",
+      "Do carry keyboard focus, safe-area spacing, reduced-motion and opaque fallback behavior into new surfaces.",
+      "Do wrap narrow layouts and keep wide tables inside local scrolling containers."
+    ],
+    "donts": [
+      "Don't introduce a dark visual mode into this light-only system.",
+      "Don't restore the former warm-paper, green-ink or display-serif theme.",
+      "Don't put reading paragraphs on translucent or blurred backgrounds.",
+      "Don't replace books with unrelated decorative image cards.",
+      "Don't use motion or stronger glass as a substitute for clear text hierarchy."
+    ]
+  }
+}

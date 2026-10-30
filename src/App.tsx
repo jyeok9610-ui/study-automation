@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowDownToLine, ArrowLeft, ArrowRight, BookOpen, Check, ChevronRight, CircleHelp, Compass, Download, Grid2X2, Library as LibraryIcon, List, Map as MapIcon, Moon, Search, Settings, Sun, Upload } from 'lucide-react';
+import { ArrowDownToLine, ArrowLeft, ArrowRight, BookOpen, Check, ChevronRight, CircleHelp, Compass, Download, Grid2X2, Library as LibraryIcon, List, Map as MapIcon, Search, Settings, Upload } from 'lucide-react';
 import type { Book, BookSummary, Library } from './shared/schema';
 import { getBook, getLibrary } from './lib/content';
 import { exportReading, getProgress, importReading, type Progress } from './lib/storage';
@@ -58,7 +58,7 @@ function Paths({library}:{library:Library}) {
 function KnowledgeMap({library}:{library:Library}) {
   const [selected,setSelected]=useState(library.concepts[0]?.id||'');const c=library.concepts.find(x=>x.id===selected);
   const pos=(i:number)=>({x:60+(i%3)*140,y:45+Math.floor(i/3)*105});
-  return <><header className="section-title"><h1>하나를 알면, 다음이 보여요</h1><p>개념을 누르면 무엇과 왜 연결되는지 살펴볼 수 있어요.</p></header><div className="knowledge-layout"><div className="knowledge-canvas"><svg viewBox="0 0 420 285" aria-hidden="true">{library.concepts.flatMap((v,i)=>v.related.map(id=>{const j=library.concepts.findIndex(c=>c.id===id);if(j<i||j<0)return null;const a=pos(i),b=pos(j);return <line key={v.id+id} x1={a.x} y1={a.y} x2={b.x} y2={b.y} className={selected===v.id||selected===id?'active':''}/>;}))}</svg>{library.concepts.map((v,i)=>{const p=pos(i);return <button key={v.id} aria-pressed={v.id===selected} style={{left:(p.x/420*100)+'%',top:(p.y/285*100)+'%'}} onClick={()=>setSelected(v.id)}>{v.label}</button>;})}</div>{c&&<section className="concept-panel" aria-live="polite"><h2>{c.label}</h2><p>{c.description}</p><Link className="primary-button" to={bookRoute(c.bookId,c.pageId)}>여기서 공부하기<ArrowRight size={17}/></Link><h3>함께 이어지는 개념</h3><ul>{c.related.map(id=>{const v=library.concepts.find(c=>c.id===id);return v&&<li key={id}><button className="text-button" onClick={()=>setSelected(id)}>{v.label}<ChevronRight size={15}/></button></li>;})}</ul></section>}</div><details className="map-list"><summary>목록으로 관계 읽기</summary>{library.concepts.map(v=><p key={v.id}><button onClick={()=>setSelected(v.id)}>{v.label}</button> · {v.related.map(id=>library.concepts.find(c=>c.id===id)?.label).join(', ')}</p>)}</details></>;
+  return <><header className="section-title"><h1>하나를 알면, 다음이 보여요</h1><p>개념을 누르면 무엇과 왜 연결되는지 살펴볼 수 있어요.</p></header><div className="knowledge-layout"><div className="knowledge-canvas"><svg viewBox="0 0 420 285" preserveAspectRatio="none" aria-hidden="true">{library.concepts.flatMap((v,i)=>v.related.map(id=>{const j=library.concepts.findIndex(c=>c.id===id);if(j<i||j<0)return null;const a=pos(i),b=pos(j);return <line key={v.id+id} x1={a.x} y1={a.y} x2={b.x} y2={b.y} className={selected===v.id||selected===id?'active':''}/>;}))}</svg>{library.concepts.map((v,i)=>{const p=pos(i);return <button key={v.id} aria-pressed={v.id===selected} style={{left:(p.x/420*100)+'%',top:(p.y/285*100)+'%'}} onClick={()=>setSelected(v.id)}>{v.label}</button>;})}</div>{c&&<section className="concept-panel" aria-live="polite"><h2>{c.label}</h2><p>{c.description}</p><Link className="primary-button" to={bookRoute(c.bookId,c.pageId)}>여기서 공부하기<ArrowRight size={17}/></Link><h3>함께 이어지는 개념</h3><ul>{c.related.map(id=>{const v=library.concepts.find(c=>c.id===id);return v&&<li key={id}><button className="text-button" onClick={()=>setSelected(id)}>{v.label}<ChevronRight size={15}/></button></li>;})}</ul></section>}</div><details className="map-list"><summary>목록으로 관계 읽기</summary>{library.concepts.map(v=><p key={v.id}><button onClick={()=>setSelected(v.id)}>{v.label}</button> · {v.related.map(id=>library.concepts.find(c=>c.id===id)?.label).join(', ')}</p>)}</details></>;
 }
 function AboutBook() {
   const {book,error}=useBook();if(error)return <Empty title="자료 정보를 열지 못했어요" text={error}/>;if(!book)return <Loading/>;
@@ -72,13 +72,34 @@ function ReadingSettings() {
 function Empty({title,text,action}:{title:string;text:string;action?:React.ReactNode}){return <div className="empty-state"><BookOpen size={38}/><h2>{title}</h2><p>{text}</p>{action||<Link className="text-link" to="/">전체 서재로<ArrowRight size={17}/></Link>}</div>;}
 function Loading(){return <div className="loading" role="status">서재를 열고 있어요…</div>;}
 export default function App(){
-  const [library,setLibrary]=useState<Library>(),[error,setError]=useState(''),[theme,setTheme]=useState(()=>(()=>{try{return localStorage.getItem('library-theme')||'system';}catch{return 'system';}})()),location=useLocation();
+  const [library,setLibrary]=useState<Library>(),[error,setError]=useState(''),location=useLocation();
   useEffect(()=>{getLibrary().then(setLibrary).catch(e=>setError(e.message));},[]);
-  useEffect(()=>{document.documentElement.dataset.theme=theme;try{localStorage.setItem('library-theme',theme);}catch{}},[theme]);
+  useEffect(()=>{
+    document.documentElement.dataset.theme='light';
+    const update=()=>{const value=window.scrollY>16?'true':'false';if(document.documentElement.dataset.scrolled!==value)document.documentElement.dataset.scrolled=value;};
+    update();window.addEventListener('scroll',update,{passive:true});
+    return()=>window.removeEventListener('scroll',update);
+  },[]);
   const reading=/^\/books\/[^/]+\/pages\/[^/]+\/?$/.test(location.pathname);
   useEffect(()=>{if(!reading)window.scrollTo(0,0);},[location.key,reading]);
-  return <div className={'app '+(reading?'is-reading':'')}><a className="skip-link" href="#main" onClick={e=>{e.preventDefault();const main=document.getElementById("main");if(main){main.setAttribute("tabindex","-1");main.focus();main.scrollIntoView();}}}>본문으로 건너뛰기</a><header className="site-header"><Link className="brand" to="/"><BookOpen size={25} strokeWidth={1.5}/><span>나의 지식 서재</span></Link><nav className="main-nav" aria-label="주 메뉴"><NavLink to="/" end><LibraryIcon size={18}/><span>서재</span></NavLink><NavLink to="/paths"><Compass size={18}/><span>읽기 노선</span></NavLink><NavLink to="/map"><MapIcon size={18}/><span>지식 지도</span></NavLink><NavLink to="/search"><Search size={18}/><span>검색</span></NavLink></nav><div className="header-tools"><button aria-label={theme==='dark'?'밝은 테마로':'어두운 테마로'} onClick={()=>setTheme(theme==='dark'?'light':'dark')}>{theme==='dark'?<Sun size={19}/>:<Moon size={19}/>}</button><Link aria-label="내 읽기 기록" to="/settings"><Settings size={19}/></Link></div></header>
-  {error?<main className="site-content" id="main"><Empty title="서재를 불러오지 못했어요" text={error} action={<button className="primary-button" onClick={()=>window.location.reload()}>다시 열기</button>}/></main>:!library?<Loading/>:reading?<Routes><Route path="/books/:bookId/pages/:pageId" element={<Reader/>}/></Routes>:<main className="site-content" id="main"><Routes><Route path="/" element={<Home library={library}/>}/><Route path="/subjects/:subjectId" element={<Subject library={library}/>}/><Route path="/books/:bookId" element={<BookIntro/>}/><Route path="/books/:bookId/about" element={<AboutBook/>}/><Route path="/search" element={<SearchPage library={library}/>}/><Route path="/paths" element={<Paths library={library}/>}/><Route path="/paths/:pathId" element={<Paths library={library}/>}/><Route path="/map" element={<KnowledgeMap library={library}/>}/><Route path="/settings" element={<ReadingSettings/>}/><Route path="*" element={<Empty title="이 페이지는 서재에 없어요" text="아래 링크에서 다시 시작해주세요."/>}/></Routes></main>}
-  {!reading&&<footer className="site-footer"><span>나의 지식 서재</span><p>천천히 읽고, 내 말로 이해하는 공간.</p><Link to="/settings">내 읽기 기록 보관하기</Link></footer>}</div>;
+  const currentSubject=library?.subjects.find(s=>location.pathname==='/subjects/'+s.id);
+  const titles:Record<string,string>={search:'서재 검색',paths:'읽기 노선',map:'지식 지도',settings:'내 읽기 기록',books:'학습책'};
+  const title=reading?'학습책 읽기':currentSubject?.title||titles[location.pathname.split('/')[1]]||'전체 서재';
+  return <div className={'app '+(reading?'is-reading':'')}>
+    <a className="skip-link" href="#main" onClick={e=>{e.preventDefault();const main=document.getElementById('main');if(main){main.setAttribute('tabindex','-1');main.focus();main.scrollIntoView();}}}>본문으로 건너뛰기</a>
+    <header className="site-header glass">
+      <Link className="brand" to="/"><span className="brand-mark"><BookOpen size={23} strokeWidth={1.7} aria-hidden="true"/></span><span>나의 지식 서재</span></Link>
+      <nav className="main-nav" aria-label="주 메뉴">
+        <NavLink to="/" end><LibraryIcon size={19} aria-hidden="true"/><span>서재</span></NavLink>
+        <NavLink to="/paths"><Compass size={19} aria-hidden="true"/><span>읽기 노선</span></NavLink>
+        <NavLink to="/map"><MapIcon size={19} aria-hidden="true"/><span>지식 지도</span></NavLink>
+        <NavLink to="/search"><Search size={19} aria-hidden="true"/><span>검색</span></NavLink>
+      </nav>
+      {library&&<nav className="sidebar-subjects" aria-label="분야 바로가기"><h2>나의 분야</h2>{library.subjects.map(s=><NavLink key={s.id} to={'/subjects/'+s.id}><span className="subject-dot" style={{background:s.color}}/><span>{s.title}</span><ChevronRight size={14} aria-hidden="true"/></NavLink>)}</nav>}
+      <div className="header-tools"><Link aria-label="내 읽기 기록" to="/settings"><Settings size={19} aria-hidden="true"/><span>읽기 기록 및 보관</span></Link></div>
+    </header>
+    <div className="workspace-toolbar glass"><div className="workspace-location"><LibraryIcon size={17} aria-hidden="true"/><span>나의 지식 서재</span><ChevronRight size={14} aria-hidden="true"/><strong>{title}</strong></div><Link className="toolbar-search" to="/search"><Search size={16} aria-hidden="true"/><span>서재에서 찾기</span></Link></div>
+    {error?<main className="site-content" id="main"><Empty title="서재를 불러오지 못했어요" text={error} action={<button className="primary-button" onClick={()=>window.location.reload()}>다시 열기</button>}/></main>:!library?<Loading/>:reading?<Routes><Route path="/books/:bookId/pages/:pageId" element={<Reader/>}/></Routes>:<main className="site-content" id="main"><Routes><Route path="/" element={<Home library={library}/>}/><Route path="/subjects/:subjectId" element={<Subject library={library}/>}/><Route path="/books/:bookId" element={<BookIntro/>}/><Route path="/books/:bookId/about" element={<AboutBook/>}/><Route path="/search" element={<SearchPage library={library}/>}/><Route path="/paths" element={<Paths library={library}/>}/><Route path="/paths/:pathId" element={<Paths library={library}/>}/><Route path="/map" element={<KnowledgeMap library={library}/>}/><Route path="/settings" element={<ReadingSettings/>}/><Route path="*" element={<Empty title="이 페이지는 서재에 없어요" text="아래 링크에서 다시 시작해주세요."/>}/></Routes></main>}
+    {!reading&&<footer className="site-footer"><span>나의 지식 서재</span><p>천천히 읽고, 내 말로 이해하는 공간.</p><Link to="/settings">내 읽기 기록 보관하기</Link></footer>}
+  </div>;
 }
-
