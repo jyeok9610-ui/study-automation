@@ -5,6 +5,7 @@ import type { Block, Book } from '../shared/schema';
 import { getBook } from '../lib/content';
 import { getNotes, getProgress, saveNote, saveProgress, type Progress } from '../lib/storage';
 import BookmarkButton from './BookmarkButton';
+import { DeviceSpeechProvider, SpeechButton } from './DeviceSpeech';
 import { getWordEntries } from '../lib/word-data';
 import { WordDefinition, WordHelpProvider, WordText } from './WordHelp';
 import { CounterLab, DialogueLab, PositionLab, ResetButton, SentenceLab } from './Widgets';
@@ -23,7 +24,7 @@ function BlockView({block,showSources,epoch}:{block:Block;showSources:boolean;ep
     {block.type==='question'?<QuestionCard key={block.id+'-'+epoch} block={block}/>:<>
       {block.title&&<h2><WordText text={block.title}/></h2>}
       {block.text&&block.text.split(/\n{2,}/).map((v,i)=><p key={i}><WordText text={v}/></p>)}
-      {block.examples?.map((e,i)=><div className="example" key={i}><p className="japanese" lang="ja"><WordText text={e.ja}/></p><p className="reading" lang="ja">{e.reading}</p><p className="meaning">{e.meaning}</p>{e.note&&<p><WordText text={e.note}/></p>}</div>)}
+      {block.examples?.map((e,i)=><div className="example" key={i}><div className="example-speech"><p className="japanese" lang="ja"><WordText text={e.ja}/></p><SpeechButton text={e.reading} label="일본어 예문"/></div><p className="reading" lang="ja">{e.reading}</p><p className="meaning">{e.meaning}</p>{e.note&&<p><WordText text={e.note}/></p>}</div>)}
       {block.type==='table'&&<div className="table-scroll" role="region" aria-label={block.title||'학습 표'} tabIndex={0}><table><thead><tr>{block.headers?.map((h,i)=><th key={i}><WordText text={h}/></th>)}</tr></thead><tbody>{block.rows?.map((row,i)=><tr key={i}>{row.map((cell,j)=><td key={j}><WordText text={cell}/></td>)}</tr>)}</tbody></table></div>}
       {block.type==='dialogue'&&<DialogueLab/>}{block.type==='position'&&<PositionLab/>}{block.type==='sentence'&&<SentenceLab/>}{block.type==='counter'&&<CounterLab/>}
     </>}
@@ -96,7 +97,7 @@ export default function Reader() {
   if(error)return <div className="empty-state"><h1>책을 열지 못했어요</h1><p>{error}</p><Link to="/library">서재로 돌아가기</Link></div>;
   if(!book)return <div className="loading" role="status">책을 펼치고 있어요…</div>;
   if(!page)return <div className="empty-state"><h1>이 페이지를 찾지 못했어요</h1><p>책의 목차에서 읽을 곳을 다시 골라주세요.</p><Link to={'/books/'+bookId}>목차로</Link></div>;
-  return <WordHelpProvider key={bookId+'/'+pageId} entries={book.glossary} enabled={book.subject==='japanese'}><div className="reader-layout">
+  return <DeviceSpeechProvider key={bookId+'/'+pageId}><WordHelpProvider entries={book.glossary} enabled={book.subject==='japanese'}><div className="reader-layout">
     <aside className={'toc '+(toc?'open':'')} aria-label="책 목차"><Link className="back-link" to={'/books/'+bookId}><ArrowLeft size={16}/>책 소개</Link><h2>{book.title}</h2><p>{(progress?.readPages||[]).length} / {book.pages.length} 페이지 읽음</p><ol>{book.pages.map((p,i)=><li key={p.id}><Link aria-current={p.id===pageId?'page':undefined} to={'/books/'+bookId+'/pages/'+p.id}><span>{String(i+1).padStart(2,'0')}</span>{p.title}{progress?.readPages.includes(p.id)&&<Check size={14} aria-label="읽음"/>}</Link></li>)}</ol><Link to={'/books/'+bookId+'/about'}>이 책의 자료와 교정</Link></aside>
     <main className="reader-main" id="main"><div className="reader-toolbar"><button className="text-button mobile-toc" onClick={()=>setToc(!toc)} aria-expanded={toc}><List size={18}/>목차</button><span>{index+1} / {book.pages.length}</span><div><BookmarkButton key={bookId+'/'+pageId} bookId={bookId} pageId={pageId}/><button onClick={event=>togglePanel('dictionary',event.currentTarget)} aria-expanded={panel==='dictionary'}>사전</button><button onClick={event=>togglePanel('sources',event.currentTarget)} aria-expanded={panel==='sources'}>출처</button><button aria-label="메모" onClick={event=>togglePanel('notes',event.currentTarget)} aria-expanded={panel==='notes'}><MessageSquare size={16}/><span>메모</span></button></div></div>
       <article className="reading-paper"><header className="page-header"><Link to={'/subjects/'+book.subject}>{book.section}</Link><h1><WordText text={page.title}/></h1><p className="page-goal"><WordText text={page.goal}/></p><span className="read-time">차근차근 약 {page.minutes}분</span></header>
@@ -111,5 +112,5 @@ export default function Reader() {
       {panel==='sources'&&<><p>수업 자료, 교정을 반영한 설명, 새로 만든 보충을 구분해서 읽어주세요.</p><label className="check-row"><input type="checkbox" checked={showSources} onChange={e=>setShowSources(e.target.checked)}/>본문마다 출처 표시</label><ul className="source-list">{book.sources.map(s=><li key={s.id}><strong>{s.id}</strong><span>{s.label}</span></li>)}</ul><Link to={'/books/'+bookId+'/about'}>자료 대응과 이 책 정보</Link></>}
       {panel==='notes'&&<><p>이 페이지에서 이해한 것과 아직 궁금한 것을 적어보세요. 메모는 같은 브라우저에 자동 저장돼요.</p><label className="field-label" htmlFor="reader-note">페이지 메모</label><textarea id="reader-note" rows={12} maxLength={50000} value={note} onChange={e=>updateNote(e.target.value)}/><p role="status" className="save-status">{saveMessage}</p><Link to="/settings">기록을 파일로 보관하기</Link></>}
     </div></>}
-  </div></WordHelpProvider>;
+  </div></WordHelpProvider></DeviceSpeechProvider>;
 }

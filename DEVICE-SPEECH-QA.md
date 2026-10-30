@@ -1,0 +1,17 @@
+# On-device Japanese pronunciation — 2026-10-30
+
+## Delivered behavior
+Speaker buttons are available for whole-word readings, each displayed alternative, individual kanji readings and the existing Japanese example sentences. The site stores no recordings and connects no paid/external TTS service. Only Japanese voices explicitly reporting localService=true are eligible; a remote Japanese or local non-Japanese default is never selected as a fallback.
+
+Words and characters use the curated kana already displayed; sentences use the authored example reading. Fragments ending with っ/ッ offer the complete word with a visible “단어로 듣기” cue. Utterances start directly in the tap/click gesture at rate 0.9. One controller retains the utterance while speaking, stops before another reading, and changes the active button into a stop action. Closing the word popup, leaving the page, hiding the document and pagehide cancel active playback. Voice catalog changes only update availability and never start audio automatically.
+
+Delayed/missing local Japanese voices, unsupported APIs and synthesis errors display guidance. The voice catalog is checked again on the next tap, allowing recovery after installing a voice or a late voiceschanged event. Popup sizing is observed as guidance appears, and its top/max height reserve the global header so the menu remains reachable. Speaker targets are 44px, have Korean action labels and pressed state, and do not nest inside answer buttons. Source material, learning IDs, saved records and the accepted word-highlighting criteria are unchanged.
+
+## Verification
+- Unit tests: 18/18; typecheck, content validation and final Pages build passed.
+- Deterministic speech tests simulate local/remote catalogs, delayed voices, end/error callbacks and unavailable APIs. They verify the exact word/character/sentence kana, ja-JP voice selection, replacement/stop, popup close and route cancellation, no automatic playback and no remote/other-language fallback.
+- Full 72-case browser pass initially had 71 passing and one WebKit mobile failure: the enlarged popup covered the menu. Its viewport placement was fixed; all 28 affected speech/word cases then passed across Chromium/WebKit desktop/mobile, including that regression and stronger route-stop assertions. The final Korean lang attribute on speech action buttons is nonvisual.
+- Visual evidence: .impeccable/review/liquid-glass/device-speech/ contains 18 screenshots/checks across two engines and three resolutions for simulated playback, missing-voice popup guidance and example guidance. No clipping, header coverage, overflow, console or page errors were reported. Mobile word/long-word guidance and example screenshots were visually inspected.
+- The actual Aside PC browser reports speech support and one available voice, with no Japanese voice exposed after catalog loading. No audible Japanese playback was claimed on this PC. Positive browser tests/screenshots use a simulated synthesis API and verify integration, not audible output or voice quality. Actual iPhone Safari playback remains to be confirmed by the user.
+
+No packages, permissions, API keys or remote services were added. Use npm install and npm run dev locally; the existing master Pages workflow publishes the site.

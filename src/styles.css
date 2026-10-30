@@ -3205,3 +3205,16 @@ button.word-link:active{transform:none}
 .word-kanji-reading{color:var(--accent-text);font-size:16px;font-weight:550}
 .word-kanji-meaning{font-size:14px}
 .word-reading-note{margin:0 0 14px;color:var(--muted);font-size:12px;line-height:1.8}
+
+.speech-control{display:inline-flex;align-items:center;flex-wrap:wrap;max-width:100%;vertical-align:middle}
+button.speech-button{display:inline-grid;place-items:center;flex-shrink:0;width:44px;height:44px;min-height:44px;margin:0;padding:0;border:0;border-radius:12px;background:transparent;color:var(--accent-text);vertical-align:middle}
+button.speech-button:hover,button.speech-button[aria-pressed=true]{background:var(--wash)}
+.speech-feedback{display:block;flex-basis:100%;max-width:34ch;margin:4px 0 8px;font-size:12px;font-weight:400;line-height:1.8;color:var(--muted);white-space:normal}
+.reading-audio-group{display:inline-flex;align-items:center;flex-wrap:wrap;gap:4px;max-width:100%;vertical-align:middle}
+.speech-whole-hint{display:inline-flex;align-items:center;gap:2px}
+.speech-whole-hint small{font-size:11px;font-weight:400;color:var(--muted)}
+.example-speech{display:grid;grid-template-columns:minmax(0,1fr) 44px;align-items:start;gap:8px}
+.example-speech>.japanese{grid-column:1;min-width:0}
+.example-speech>.speech-control{display:contents}
+.example-speech>.speech-control>.speech-button{grid-column:2;grid-row:1}
+.example-speech>.speech-control>.speech-feedback{grid-column:1/-1;max-width:none;margin:0}
