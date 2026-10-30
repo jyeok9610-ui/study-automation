@@ -3121,3 +3121,35 @@ img {
  .home-window-footer{font-size:10px;padding:4px 0 0}
 }
 @media(max-width:350px){.home-window{grid-template-columns:31% minmax(0,1fr)}.home-window .home-window-brand{font-size:16px}.home-window .home-primary-nav a{font-size:11px;gap:4px}.home-window .dashboard-heading h1{font-size:20px}.home-window .dashboard-stats>div{padding-inline:8px}}
+
+/* A light-dismiss navigation panel keeps the home content in focus. */
+.home-window{grid-template-columns:minmax(0,1fr)}
+.home-window-heading{display:flex;align-items:center;gap:12px;min-width:0}
+.home-menu-toggle{display:grid;place-items:center;flex-shrink:0;width:44px;height:44px;padding:0;border:0;border-radius:12px;background:transparent;color:var(--muted);cursor:pointer;transition:background 180ms var(--ease),color 180ms var(--ease)}
+.home-menu-toggle:hover,.home-menu-toggle[aria-expanded="true"]{background:var(--wash);color:var(--accent-text)}
+.home-menu-toggle:active{background:#dcecff}
+.home-navigation-popover{position:fixed;inset:136px auto auto max(16px,calc((100vw - 1080px)/2 + 32px));width:260px;max-width:calc(100vw - 32px);max-height:calc(100svh - 152px);overflow-y:auto;margin:0;padding:12px;border:1px solid var(--glass-border);border-radius:20px;color:var(--ink);background:rgb(255 255 255 / 98%);-webkit-backdrop-filter:blur(24px) saturate(155%);backdrop-filter:blur(24px) saturate(155%);box-shadow:inset 0 1px 0 #fff,0 12px 38px #202a3a26;opacity:0;transform:translateY(-6px);transition:opacity 200ms var(--ease),transform 200ms var(--ease),display 200ms allow-discrete,overlay 200ms allow-discrete}
+.home-navigation-popover:popover-open{opacity:1;transform:translateY(0)}
+.home-navigation-popover::backdrop{background:transparent}
+.home-navigation-popover .home-primary-nav{position:static;display:grid;grid-template-columns:1fr;gap:4px;padding:0;margin:0;border:0;background:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+.home-navigation-popover .home-primary-nav a{display:flex;flex-direction:row;justify-content:flex-start;align-items:center;gap:12px;min-height:48px;padding:10px 14px;border-radius:12px;font-size:16px;color:var(--muted)}
+.home-navigation-popover .home-primary-nav a.active{color:var(--accent-text);background:var(--wash);box-shadow:none}
+.home-navigation-popover .home-primary-nav a:hover{background:var(--wash)}
+.home-window-main{grid-column:1}
+.home-window .dashboard-panel{max-width:760px;margin-inline:auto}
+@starting-style{.home-navigation-popover:popover-open{opacity:0;transform:translateY(-6px)}}
+@media(max-width:760px){
+ .home-window-heading{gap:4px}
+ .home-window .home-window-brand{font-size:16px;gap:6px}
+ .home-window .brand-mark{display:none}
+ .home-navigation-popover{inset:80px auto auto 16px;max-height:calc(100svh - 96px)}
+ .home-window .dashboard-panel{padding:24px 20px}
+ .home-window .dashboard-heading h1{font-size:28px}
+ .home-window .dashboard-stats>div{min-height:120px}
+ .home-window .dashboard-stats dd{font-size:36px}
+ .home-window .dashboard-stats dt{font-size:13px}
+ .home-window .dashboard-recent-item h3{font-size:15px}
+}
+@media(max-width:350px){.home-window{grid-template-columns:minmax(0,1fr)}.home-window .home-window-brand{font-size:14px}}
+@media(prefers-reduced-transparency:reduce){.home-navigation-popover{background:var(--surface)}}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.home-navigation-popover{background:var(--surface)}}

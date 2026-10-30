@@ -10,3 +10,7 @@ Local screenshots (ignored by Git):
 - Safari engine: .impeccable/review/liquid-glass/reference-webkit/
 
 No runtime dependencies or external services were added. Run npm install and npm run dev for local use. Publishing is handled by the existing Pages workflow on master pushes; production base is /study-automation/.
+## Collapsible homepage menu — 2026-10-30
+The header menu button now toggles the existing home navigation as a light-dismiss popover. Outside click, item selection, the trigger and Escape close it; Escape explicitly restores focus for WebKit. The closed state gives the content the full panel width. Other routes retain their navigation. No storage, route or dependency changes.
+
+The first checks exposed an outside-click test targeting content covered by the mobile panel, WebKit Escape focus restoration, and one transient backup test failure during overlapping test runs. The test now clicks an unobstructed footer, focus restoration is explicit, and the final standalone full suite passed 40/40. Unit tests (10), typecheck, content validation and Pages build passed. Final screenshots: .impeccable/review/liquid-glass/collapsible-menu/ — 12 open/closed captures across Chromium/WebKit at 1920x1080, 1440x900 and 390x844, with report.json showing no overflow or console/page errors. Menu surface opacity and blur were strengthened after visual inspection to keep background text from competing with navigation.

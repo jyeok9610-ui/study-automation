@@ -10,21 +10,21 @@ test('Light Mode stays fixed without deleting an old theme preference',async({pa
  await expect(page.getByRole('button',{name:'어두운 테마로'})).toHaveCount(0);
 });
 
-test('Navigation stays in the viewport and leaves the mobile brand clear',async({page,isMobile})=>{
+test('Home menu opens, dismisses outside and with Escape, and closes on navigation',async({page})=>{
  await page.goto('/');await expect(page.locator('.dashboard-panel')).toBeVisible();
- const nav=await page.locator('.main-nav').boundingBox();expect(nav).not.toBeNull();
- if(isMobile){
-  const panel=await page.locator(".dashboard-panel").boundingBox();expect(panel).not.toBeNull();expect(nav!.x+nav!.width).toBeLessThanOrEqual(panel!.x);expect(nav!.y).toBeLessThan(160);
-  await page.evaluate(()=>scrollTo(100,0));expect(await page.evaluate(()=>scrollX)).toBe(0);
-  const brand=await page.locator('.brand').boundingBox();expect(brand!.y+brand!.height).toBeLessThan(nav!.y);
- }
- await page.getByRole('navigation',{name:'주 메뉴'}).getByRole('link',{name:'내 서재',exact:true}).click();
- await page.goto('/#/map');
- await expect(page.locator('.concept-panel')).toBeVisible();
- const dimensions=await page.evaluate(()=>({inner:innerWidth,scroll:document.documentElement.scrollWidth}));
- expect(dimensions.inner).toBe(page.viewportSize()!.width);expect(dimensions.scroll).toBeLessThanOrEqual(page.viewportSize()!.width+1);
+ const panel=page.locator('#home-navigation');
+ await expect(panel).toBeHidden();
+ await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await expect(panel).toBeVisible();
+ const bounds=await panel.boundingBox();expect(bounds!.x).toBeGreaterThanOrEqual(0);expect(bounds!.x+bounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+ await page.locator('.home-window-footer').click();await expect(panel).toBeHidden();
+ await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();
+ await panel.getByRole('link',{name:'홈',exact:true}).focus();await page.keyboard.press('Escape');await expect(panel).toBeHidden();await expect(page.getByRole('button',{name:'메뉴 열기',exact:true})).toBeFocused();
+ await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await page.getByRole('button',{name:'메뉴 닫기',exact:true}).click();await expect(panel).toBeHidden();
+ await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await panel.getByRole('link',{name:'홈',exact:true}).click();await expect(panel).toBeHidden();
+ await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await panel.getByRole('link',{name:'내 서재',exact:true}).click();await expect(page).toHaveURL(/#\/library$/);
+ await page.goto('/#/map');await expect(page.locator('.concept-panel')).toBeVisible();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width+1);
 });
-
 test('Scroll depth, opaque reading surface, and reduced motion are observable',async({page})=>{
  await page.goto('/#/books/first-sentences/pages/nominal');await expect(page.locator('.page-header')).toBeVisible();
  expect(await page.locator('.reading-paper').evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(255, 255, 255)');
