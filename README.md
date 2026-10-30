@@ -1,5 +1,7 @@
 # 나의 지식 서재
 
+[공개 학습 서재 열기](https://jyeok9610-ui.github.io/study-automation/)
+
 PC에서 학습책을 제작하고 GitHub Pages로 발행한 정적 웹을 iPhone에서 읽는 개인 학습 도서관입니다.
 
 ## 실행
@@ -8,7 +10,7 @@ Node.js 24 이상. npm ci 후 npm run dev (http://127.0.0.1:4173). npm run studi
 
 검증: npm test, npm run validate, npm run build, npm run e2e.
 
-공개 사이트는 public/content의 검수된 학습책만 사용합니다. data/의 원자료·DB·역할 산출물·로그와 studio/는 dist에 포함되지 않습니다. 읽기 기록·메모는 같은 브라우저 IndexedDB에만 남고, 문제 답·점수·풀이 이력은 저장하지 않습니다.
+공개 사이트는 public/content의 검수된 학습책만 사용합니다. data/의 원자료·DB·역할 산출물·로그와 studio/는 dist에 포함되지 않습니다. 읽기 기록·메모·북마크는 같은 브라우저 IndexedDB에만 남고, 문제 답·점수·풀이 이력은 저장하지 않습니다.
 
 ## 콘텐츠 제작
 
@@ -28,3 +30,17 @@ CODEX_EXE는 설치된 codex 절대 경로, ASIDE_EXE는 공식 Aside CLI 경로
 Light Mode UI와 스킬 검토·스크린샷·3차 QA·배포 절차는 [Liquid Glass 리디자인 기록](docs/liquid-glass-redesign.md)을 참고하세요. 로컬 서버 실행 후 `npm run visual:qa -- final`로 세 해상도 캡처를 다시 만들 수 있습니다.
 
 홈 대시보드와 페이지 북마크·기존 백업 호환 검증은 [홈·북마크 확장 기록](docs/home-dashboard.md)을 참고하세요.
+
+## WebKit 호환성 검사
+
+Playwright 브라우저는 최초 한 번 설치합니다. `npm run e2e`는 Chromium과 WebKit의 PC/모바일 프로필을 함께 검사합니다.
+
+```powershell
+npx playwright install chromium webkit
+npm run e2e
+# 로컬 개발 서버가 실행 중인 별도 터미널에서
+$env:QA_BROWSER='webkit'
+npm run visual:qa -- webkit
+```
+
+Windows의 Playwright WebKit 검사는 실제 iPhone Safari 실기기 확인과 구분합니다. 공개 배포와 실기기 결과는 [배포·브라우저 검증 기록](docs/publish-2026-10-30.md)을 참고하세요.

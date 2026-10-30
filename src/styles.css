@@ -135,6 +135,8 @@ ul,ol {
 img {
   max-width:100%;
 }
+/* Touch WebKit keeps native overlay scrollbars and its full visual viewport. */
+@media (hover: hover) and (pointer: fine) {
 ::-webkit-scrollbar {
   width:8px;
   height:8px;
@@ -146,6 +148,7 @@ img {
 }
 ::-webkit-scrollbar-track {
   background:transparent;
+}
 }
 .sr-only {
   position:absolute;

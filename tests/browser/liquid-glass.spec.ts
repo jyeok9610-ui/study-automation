@@ -15,6 +15,7 @@ test('Navigation stays in the viewport and leaves the mobile brand clear',async(
  const nav=await page.locator('.main-nav').boundingBox();expect(nav).not.toBeNull();
  if(isMobile){
   const viewport=page.viewportSize()!;expect(nav!.y).toBeGreaterThan(viewport.height-110);expect(nav!.y+nav!.height).toBeLessThanOrEqual(viewport.height);
+  await page.evaluate(()=>scrollTo(100,0));expect(await page.evaluate(()=>scrollX)).toBe(0);
   const brand=await page.locator('.brand').boundingBox();expect(brand!.y+brand!.height).toBeLessThan(nav!.y);
  }
  await page.getByRole('navigation',{name:'주 메뉴'}).getByRole('link',{name:'내 서재',exact:true}).click();

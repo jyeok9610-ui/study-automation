@@ -1,4 +1,4 @@
-import { chromium } from '@playwright/test';
+import { chromium, webkit } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 const round=process.argv[2]||'final';
@@ -6,7 +6,9 @@ if(!/^[a-z0-9-]+$/.test(round))throw new Error('Use a simple capture round name.
 const folder=path.resolve('.impeccable/review/liquid-glass',round);
 fs.mkdirSync(folder,{recursive:true});
 const base=process.env.QA_BASE_URL||'http://127.0.0.1:4173';
-const browser=await chromium.launch();
+const engines={chromium,webkit},engine=process.env.QA_BROWSER||'chromium';
+if(!(engine in engines))throw new Error('QA_BROWSER must be chromium or webkit.');
+const browser=await engines[engine as keyof typeof engines].launch();
 const reports:unknown[]=[];
 const routes=[
  ['home','/','.dashboard-panel'],
@@ -32,10 +34,11 @@ try{
   page.on('response',r=>{if(r.status()>=400)errors.push(r.status()+' '+r.url());});
   for(const [name,route,ready] of routes){
    await page.goto(base+route);await page.locator(ready).first().waitFor();await page.evaluate(()=>document.fonts.ready);await page.waitForTimeout(320);
+   const horizontalPan=await page.evaluate(async()=>{const y=scrollY;scrollTo(100,y);await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));const x=scrollX;scrollTo(0,y);return x;});
    const metrics=await page.evaluate(()=>({width:innerWidth,scrollWidth:document.documentElement.scrollWidth,colorScheme:getComputedStyle(document.documentElement).colorScheme,overflow:Array.from(document.querySelectorAll<HTMLElement>('body *')).filter(e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&(r.right>innerWidth+2||r.left < -2)&&s.position!=='fixed'&&s.visibility!=='hidden'&&s.display!=='none'&&!e.closest('.table-scroll,.sr-only,.skip-link')}).slice(0,10).map(e=>({tag:e.tagName,class:e.className}))}));
    await page.screenshot({path:path.join(folder,device+'-'+name+'.png'),fullPage:name!=='reader',animations:'disabled'});
    if(['home','map'].includes(name))await page.screenshot({path:path.join(folder,device+'-'+name+'-viewport.png'),animations:'disabled'});
-   reports.push({device,route:name,expectedWidth:width,expectedHeight:height,...metrics,errors:[...new Set(errors)]});errors.length=0;
+   reports.push({device,engine,route:name,horizontalPan,expectedWidth:width,expectedHeight:height,...metrics,errors:[...new Set(errors)]});errors.length=0;
   }
   await page.goto(base+'/#/books/first-sentences/pages/wa-ga');await page.locator('.lab').first().waitFor();await page.locator('.lab').first().scrollIntoViewIfNeeded();await page.waitForTimeout(320);
   await page.locator('.lab').first().screenshot({path:path.join(folder,device+'-activity.png'),animations:'disabled'});
@@ -46,6 +49,7 @@ try{
    await page.goto(base+'/#/books/first-sentences/pages/nominal');await page.locator('.page-header').waitFor();
    await page.getByRole('button',{name:'북마크 추가',exact:true}).click();await page.getByRole('button',{name:'북마크 해제',exact:true}).waitFor();
    await page.getByRole('button',{name:'읽음 표시',exact:true}).click();
+   await page.getByText('읽음 표시를 저장했어요.',{exact:true}).waitFor();
    await page.goto(base+'/');await page.getByText('13%',{exact:true}).waitFor();await page.screenshot({path:path.join(folder,device+'-home-with-progress.png'),animations:'disabled'});
    await page.goto(base+'/#/bookmarks');await page.locator('.bookmark-item').waitFor();await page.screenshot({path:path.join(folder,device+'-saved-bookmark.png'),animations:'disabled'});
    await page.goto(base+'/#/progress');await page.locator('.read-indicator.is-read').waitFor();await page.screenshot({path:path.join(folder,device+'-reading-progress.png'),animations:'disabled'});
@@ -62,6 +66,6 @@ try{
  }
 }finally{await browser.close();}
 fs.writeFileSync(path.join(folder,'report.json'),JSON.stringify(reports,null,2));
-const bad=reports.filter((r:any)=>r.scrollWidth>r.expectedWidth+1||r.width>r.expectedWidth+1||r.errors?.length);
-console.log(JSON.stringify({round,folder,captures:fs.readdirSync(folder).filter(name=>name.endsWith('.png')).length,pages:reports.length,issues:bad},null,2));
+const bad=reports.filter((r:any)=>r.horizontalPan>1||r.scrollWidth>r.expectedWidth+1||r.width>r.expectedWidth+1||r.errors?.length);
+console.log(JSON.stringify({round,engine,folder,captures:fs.readdirSync(folder).filter(name=>name.endsWith('.png')).length,pages:reports.length,issues:bad},null,2));
 if(bad.length)process.exitCode=1;
