@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowDownToLine, ArrowLeft, ArrowRight, BookOpen, Check, ChevronRight, CircleHelp, Compass, Download, Grid2X2, Library as LibraryIcon, List, Map as MapIcon, Search, Settings, Upload } from 'lucide-react';
+import { Link, Route, Routes, useLocation, useParams, useSearchParams } from 'react-router-dom';
+import { ArrowDownToLine, ArrowLeft, ArrowRight, BookOpen, Check, ChevronRight, CircleHelp, Compass, Download, Grid2X2, List, Search, Upload } from 'lucide-react';
 import type { Book, BookSummary, Library } from './shared/schema';
 import { getBook, getLibrary } from './lib/content';
 import { exportReading, getProgress, importReading, type Progress } from './lib/storage';
 import { searchBooks } from './lib/search';
 import Reader from './components/Reader';
 import HomeFrame from './components/HomeFrame';
-import { PrimaryNavigation, SkipLink } from './components/Navigation';
+import AppHeader from './components/AppHeader';
+import { SkipLink } from './components/Navigation';
 import { HomeDashboard, BookmarksPage, ProgressPage } from './components/Dashboard';
 
 const bookRoute=(bookId:string,pageId?:string)=>'/books/'+bookId+(pageId?'/pages/'+pageId:'');
@@ -85,20 +86,10 @@ export default function App(){
   },[]);
   const reading=/^\/books\/[^/]+\/pages\/[^/]+\/?$/.test(location.pathname);
   useEffect(()=>{if(!reading)window.scrollTo(0,0);},[location.key,reading]);
-  const currentSubject=library?.subjects.find(s=>location.pathname==='/subjects/'+s.id);
-  const titles:Record<string,string>={library:'내 서재',bookmarks:'북마크',progress:'학습 현황',search:'서재 검색',paths:'읽기 노선',map:'지식 지도',settings:'내 읽기 기록',books:'학습책'};
-  const title=reading?'학습책 읽기':currentSubject?.title||titles[location.pathname.split('/')[1]]||'홈';
-  if(location.pathname==='/')return <HomeFrame>{error?<Empty title="서재를 불러오지 못했어요" text={error} action={<button className="primary-button" onClick={()=>window.location.reload()}>다시 열기</button>}/>:library?<HomeDashboard library={library}/>:<Loading/>}</HomeFrame>;
-  return <div className={'app '+(reading?'is-reading':'')}>
+  if(location.pathname==='/')return <HomeFrame library={library}>{error?<Empty title="서재를 불러오지 못했어요" text={error} action={<button className="primary-button" onClick={()=>window.location.reload()}>다시 열기</button>}/>:library?<HomeDashboard library={library}/>:<Loading/>}</HomeFrame>;
+  return <div className={'app has-drawer '+(reading?'is-reading':'')}>
     <SkipLink/>
-    <header className="site-header glass">
-      <Link className="brand" to="/"><span className="brand-mark"><BookOpen size={23} strokeWidth={1.7} aria-hidden="true"/></span><span>나의 지식 서재</span></Link>
-      <PrimaryNavigation/>
-      <nav className="sidebar-explore" aria-label="더 둘러보기"><NavLink to="/paths"><Compass size={18}/><span>읽기 노선</span></NavLink><NavLink to="/map"><MapIcon size={18}/><span>지식 지도</span></NavLink></nav>
-      {library&&<nav className="sidebar-subjects" aria-label="분야 바로가기"><h2>나의 분야</h2>{library.subjects.map(s=><NavLink key={s.id} to={'/subjects/'+s.id}><span className="subject-dot" style={{background:s.color}}/><span>{s.title}</span><ChevronRight size={14} aria-hidden="true"/></NavLink>)}</nav>}
-      <div className="header-tools"><Link className="mobile-search" aria-label="검색 화면 열기" to="/search"><Search size={19} aria-hidden="true"/></Link><Link aria-label="내 읽기 기록" to="/settings"><Settings size={19} aria-hidden="true"/><span>읽기 기록 및 보관</span></Link></div>
-    </header>
-    <div className="workspace-toolbar glass"><div className="workspace-location"><LibraryIcon size={17} aria-hidden="true"/><span>나의 지식 서재</span><ChevronRight size={14} aria-hidden="true"/><strong>{title}</strong></div><Link className="toolbar-search" to="/search"><Search size={16} aria-hidden="true"/><span>서재에서 찾기</span></Link>{location.pathname==='/'&&<Link className="dashboard-settings" aria-label="읽기 기록 설정" to="/settings"><Settings size={20}/></Link>}</div>
+    <AppHeader library={library}/>
     {error?<main className="site-content" id="main"><Empty title="서재를 불러오지 못했어요" text={error} action={<button className="primary-button" onClick={()=>window.location.reload()}>다시 열기</button>}/></main>:!library?<Loading/>:reading?<Routes><Route path="/books/:bookId/pages/:pageId" element={<Reader/>}/></Routes>:<main className="site-content" id="main"><Routes><Route path="/" element={<HomeDashboard library={library}/>}/><Route path="/library" element={<LibraryPage library={library}/>}/><Route path="/bookmarks" element={<BookmarksPage library={library}/>}/><Route path="/progress" element={<ProgressPage library={library}/>}/><Route path="/subjects/:subjectId" element={<Subject library={library}/>}/><Route path="/books/:bookId" element={<BookIntro/>}/><Route path="/books/:bookId/about" element={<AboutBook/>}/><Route path="/search" element={<SearchPage library={library}/>}/><Route path="/paths" element={<Paths library={library}/>}/><Route path="/paths/:pathId" element={<Paths library={library}/>}/><Route path="/map" element={<KnowledgeMap library={library}/>}/><Route path="/settings" element={<ReadingSettings/>}/><Route path="*" element={<Empty title="이 페이지는 서재에 없어요" text="아래 링크에서 다시 시작해주세요."/>}/></Routes></main>}
     {!reading&&<footer className="site-footer"><span>나의 지식 서재</span><p>천천히 읽고, 내 말로 이해하는 공간.</p><Link to="/settings">내 읽기 기록 보관하기</Link></footer>}
   </div>;

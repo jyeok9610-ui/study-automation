@@ -12,7 +12,7 @@ test('Light Mode stays fixed without deleting an old theme preference',async({pa
 
 test('Home menu opens, dismisses outside and with Escape, and closes on navigation',async({page})=>{
  await page.goto('/');await expect(page.locator('.dashboard-panel')).toBeVisible();
- const panel=page.locator('#home-navigation');
+ const panel=page.locator('#app-navigation');
  await expect(panel).toBeHidden();
  await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await expect(panel).toBeVisible();await expect.poll(async()=>Math.round((await panel.boundingBox())!.x)).toBe(0);
  const bounds=await panel.boundingBox();expect(Math.abs(bounds!.x)).toBeLessThanOrEqual(1);expect(Math.abs(bounds!.y)).toBeLessThanOrEqual(1);expect(Math.abs(bounds!.height-page.viewportSize()!.height)).toBeLessThanOrEqual(1);expect(bounds!.x+bounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width-40);

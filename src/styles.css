@@ -3159,3 +3159,18 @@ img {
 @media(max-width:350px){.home-window{grid-template-columns:minmax(0,1fr)}.home-window .home-window-brand{font-size:14px}}
 @media(prefers-reduced-transparency:reduce){.home-navigation-popover{background:var(--surface)}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.home-navigation-popover{background:var(--surface)}}
+
+/* Every route shares the same header and edge drawer. */
+.app.has-drawer{--rail:0px;padding:0;min-height:100svh}
+.app-header.site-header{position:sticky;inset:0 0 auto;z-index:60;width:auto;height:auto;min-height:76px;padding:14px 32px;flex-direction:row;align-items:center;justify-content:space-between;gap:16px;border:0;border-bottom:1px solid var(--glass-border);border-radius:0;background:var(--glass-fill);box-shadow:0 2px 12px #202a3a06}
+.app-header .brand{padding:0;font-size:20px;gap:10px}
+.app-header::before{content:none}
+.home-navigation-popover .sidebar-explore,.home-navigation-popover .sidebar-subjects{display:grid}
+.home-navigation-popover .sidebar-subjects{margin-top:24px}
+@media(max-width:760px){
+ .app-header.site-header{min-height:calc(64px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 16px 0}
+ .app-header .home-window-heading{gap:4px}
+ .app-header .brand{font-size:16px}
+ .app-header .brand-mark{display:none}
+}
+@media(max-width:350px){.app-header .brand{font-size:14px}}
