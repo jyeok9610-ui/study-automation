@@ -5,24 +5,25 @@ import type { Block, Book } from '../shared/schema';
 import { getBook } from '../lib/content';
 import { getNotes, getProgress, saveNote, saveProgress, type Progress } from '../lib/storage';
 import BookmarkButton from './BookmarkButton';
+import { WordDefinition, WordHelpProvider, WordText } from './WordHelp';
 import { CounterLab, DialogueLab, PositionLab, ResetButton, SentenceLab } from './Widgets';
 
 function QuestionCard({block}:{block:Block}) {
   const q=block.question!;const [selected,setSelected]=useState<number|null>(null),[reveal,setReveal]=useState(false);
-  return <div className="question"><h3>{block.title||'생각을 확인해 볼까요?'}</h3><p>{q.prompt}</p><div className="question-options">{q.options.map((v,i)=><button key={i} aria-pressed={selected===i} className={selected===i?(i===q.answer?'correct':'incorrect'):''} onClick={()=>{setSelected(i);setReveal(true);}}><span className="option-letter">{String.fromCharCode(65+i)}</span><span>{v}</span>{selected===i&&i===q.answer&&<Check size={18} aria-hidden="true"/>}</button>)}</div>
+  return <div className="question"><h3>{block.title||'생각을 확인해 볼까요?'}</h3><p><WordText text={q.prompt}/></p><div className="question-options">{q.options.map((v,i)=><button key={i} aria-pressed={selected===i} className={selected===i?(i===q.answer?'correct':'incorrect'):''} onClick={()=>{setSelected(i);setReveal(true);}}><span className="option-letter">{String.fromCharCode(65+i)}</span><span>{v}</span>{selected===i&&i===q.answer&&<Check size={18} aria-hidden="true"/>}</button>)}</div>
   {selected!==null&&<p className="feedback" role="status">{selected===q.answer?'잘 짚으셨어요. 이유까지 확인해 보세요.':q.wrongExplanations?.[selected]||'다시 문맥을 살펴보세요. 아래 해설에서 차이를 확인할 수 있어요.'}</p>}
   <button className="explanation-toggle" aria-expanded={reveal} onClick={()=>setReveal(!reveal)}><ChevronDown size={16} aria-hidden="true"/>{reveal?'해설 접기':'정답과 해설 보기'}</button>
-  {reveal&&<div className="explanation"><strong>함께 이해하기</strong><p>{q.explanation}</p></div>}
+  {reveal&&<div className="explanation"><strong>함께 이해하기</strong><p><WordText text={q.explanation}/></p></div>}
   {selected!==null&&<ResetButton onClick={()=>{setSelected(null);setReveal(false);}}/>}</div>;
 }
 function BlockView({block,showSources,epoch}:{block:Block;showSources:boolean;epoch:number}) {
   const provenance=block.provenance==='supplement'?'이해를 돕는 보충':block.provenance==='correction'?'교정을 반영한 설명':'수업 자료에서';
   return <section className={'learning-block block-'+block.type} id={block.id} data-block-id={block.id}>
     {block.type==='question'?<QuestionCard key={block.id+'-'+epoch} block={block}/>:<>
-      {block.title&&<h2>{block.title}</h2>}
-      {block.text&&block.text.split(/\n{2,}/).map((v,i)=><p key={i}>{v}</p>)}
-      {block.examples?.map((e,i)=><div className="example" key={i}><p className="japanese" lang="ja">{e.ja}</p><p className="reading" lang="ja">{e.reading}</p><p className="meaning">{e.meaning}</p>{e.note&&<p>{e.note}</p>}</div>)}
-      {block.type==='table'&&<div className="table-scroll" role="region" aria-label={block.title||'학습 표'} tabIndex={0}><table><thead><tr>{block.headers?.map((h,i)=><th key={i}>{h}</th>)}</tr></thead><tbody>{block.rows?.map((row,i)=><tr key={i}>{row.map((cell,j)=><td key={j}>{cell}</td>)}</tr>)}</tbody></table></div>}
+      {block.title&&<h2><WordText text={block.title}/></h2>}
+      {block.text&&block.text.split(/\n{2,}/).map((v,i)=><p key={i}><WordText text={v}/></p>)}
+      {block.examples?.map((e,i)=><div className="example" key={i}><p className="japanese" lang="ja"><WordText text={e.ja}/></p><p className="reading" lang="ja">{e.reading}</p><p className="meaning">{e.meaning}</p>{e.note&&<p><WordText text={e.note}/></p>}</div>)}
+      {block.type==='table'&&<div className="table-scroll" role="region" aria-label={block.title||'학습 표'} tabIndex={0}><table><thead><tr>{block.headers?.map((h,i)=><th key={i}><WordText text={h}/></th>)}</tr></thead><tbody>{block.rows?.map((row,i)=><tr key={i}>{row.map((cell,j)=><td key={j}><WordText text={cell}/></td>)}</tr>)}</tbody></table></div>}
       {block.type==='dialogue'&&<DialogueLab/>}{block.type==='position'&&<PositionLab/>}{block.type==='sentence'&&<SentenceLab/>}{block.type==='counter'&&<CounterLab/>}
     </>}
     {showSources&&<p className="provenance">{provenance} · {block.sourceIds.join(' · ')}</p>}
@@ -93,19 +94,20 @@ export default function Reader() {
   if(error)return <div className="empty-state"><h1>책을 열지 못했어요</h1><p>{error}</p><Link to="/library">서재로 돌아가기</Link></div>;
   if(!book)return <div className="loading" role="status">책을 펼치고 있어요…</div>;
   if(!page)return <div className="empty-state"><h1>이 페이지를 찾지 못했어요</h1><p>책의 목차에서 읽을 곳을 다시 골라주세요.</p><Link to={'/books/'+bookId}>목차로</Link></div>;
-  return <div className="reader-layout">
+  return <WordHelpProvider key={bookId+'/'+pageId} entries={book.glossary} enabled={book.subject==='japanese'}><div className="reader-layout">
     <aside className={'toc '+(toc?'open':'')} aria-label="책 목차"><Link className="back-link" to={'/books/'+bookId}><ArrowLeft size={16}/>책 소개</Link><h2>{book.title}</h2><p>{(progress?.readPages||[]).length} / {book.pages.length} 페이지 읽음</p><ol>{book.pages.map((p,i)=><li key={p.id}><Link aria-current={p.id===pageId?'page':undefined} to={'/books/'+bookId+'/pages/'+p.id}><span>{String(i+1).padStart(2,'0')}</span>{p.title}{progress?.readPages.includes(p.id)&&<Check size={14} aria-label="읽음"/>}</Link></li>)}</ol><Link to={'/books/'+bookId+'/about'}>이 책의 자료와 교정</Link></aside>
     <main className="reader-main" id="main"><div className="reader-toolbar"><button className="text-button mobile-toc" onClick={()=>setToc(!toc)} aria-expanded={toc}><List size={18}/>목차</button><span>{index+1} / {book.pages.length}</span><div><BookmarkButton key={bookId+'/'+pageId} bookId={bookId} pageId={pageId}/><button onClick={event=>togglePanel('dictionary',event.currentTarget)} aria-expanded={panel==='dictionary'}>사전</button><button onClick={event=>togglePanel('sources',event.currentTarget)} aria-expanded={panel==='sources'}>출처</button><button aria-label="메모" onClick={event=>togglePanel('notes',event.currentTarget)} aria-expanded={panel==='notes'}><MessageSquare size={16}/><span>메모</span></button></div></div>
-      <article className="reading-paper"><header className="page-header"><Link to={'/subjects/'+book.subject}>{book.section}</Link><h1>{page.title}</h1><p className="page-goal">{page.goal}</p><span className="read-time">차근차근 약 {page.minutes}분</span></header>
+      <article className="reading-paper"><header className="page-header"><Link to={'/subjects/'+book.subject}>{book.section}</Link><h1><WordText text={page.title}/></h1><p className="page-goal"><WordText text={page.goal}/></p><span className="read-time">차근차근 약 {page.minutes}분</span></header>
+        {book.subject==='japanese'&&<p className="word-help-hint">밑줄이 있는 단어를 누르면 읽기와 한자 풀이를 볼 수 있어요.</p>}
         {page.blocks.map(block=><BlockView key={block.id+'-'+epoch} block={block} epoch={epoch} showSources={showSources}/>)}
         <footer className="page-end"><BookOpen size={30}/><h2>오늘 이해한 것을 한 문장으로 말해 보세요</h2><p>정답을 외웠는지보다, 왜 그런 표현을 쓰는지 설명할 수 있는지 확인해 보세요.</p><div className="choice-row"><button aria-pressed={progress?.readPages.includes(pageId)||false} onClick={()=>mark('readPages')}><Check size={17}/>읽음 표시</button><button aria-pressed={progress?.reviewPages.includes(pageId)||false} onClick={()=>mark('reviewPages')}>복습 표시</button></div><p className="save-status" role="status">{saveMessage}</p><p className="quiet">읽던 위치와 진도는 이 브라우저에 남아요. 문제와 이전 풀이 기록은 다시 열 때 비워져요.</p></footer>
       </article>
       <nav className="page-nav" aria-label="페이지 이동">{index>0?<Link to={'/books/'+bookId+'/pages/'+book.pages[index-1].id}><ArrowLeft size={18}/><span><small>이전</small>{book.pages[index-1].title}</span></Link>:<Link to={'/books/'+bookId}><ArrowLeft size={18}/>목차</Link>}{index<book.pages.length-1?<Link to={'/books/'+bookId+'/pages/'+book.pages[index+1].id}><span><small>다음</small>{book.pages[index+1].title}</span><ArrowRight size={18}/></Link>:<Link to={'/subjects/'+book.subject}>내부 서재로<ArrowRight size={18}/></Link>}</nav>
     </main>
     {panel&&<><div className="sheet-scrim" aria-hidden="true"/><div ref={sheetRef} tabIndex={-1} className="side-sheet" role="dialog" aria-modal={mobilePanel} aria-label={panel==='dictionary'?'한자와 어휘 사전':panel==='sources'?'출처와 보충 설명':'내 메모'}><div className="sheet-header"><h2>{panel==='dictionary'?'읽다가 궁금한 말':panel==='sources'?'자료와 보충의 구분':'내 메모'}</h2><button aria-label="도움말 닫기" onClick={()=>setPanel(null)}><X size={21}/></button></div>
-      {panel==='dictionary'&&<><label className="field-label" htmlFor="dictionary-search">단어·읽기·뜻 찾기</label><input id="dictionary-search" value={dictionaryQuery} onChange={e=>setDictionaryQuery(e.target.value)} placeholder="예: 私, わたし, 나"/><div className="dictionary-list">{book.glossary.filter(v=>(v.word+' '+v.reading+' '+v.meaning).includes(dictionaryQuery)).map(v=><details key={v.id}><summary><span lang="ja">{v.word}</span><small>{v.meaning}</small></summary><p lang="ja">{v.reading}</p><p>{v.note}</p></details>)}</div></>}
+      {panel==='dictionary'&&<><label className="field-label" htmlFor="dictionary-search">단어·읽기·뜻 찾기</label><input id="dictionary-search" value={dictionaryQuery} onChange={e=>setDictionaryQuery(e.target.value)} placeholder="예: 私, わたし, 나"/><div className="dictionary-list">{book.glossary.filter(v=>(v.word+' '+v.reading+' '+v.meaning).includes(dictionaryQuery)).map(v=><details key={v.id}><summary><span lang="ja">{v.word}</span><small>{v.meaning}</small></summary><WordDefinition entry={v}/></details>)}</div></>}
       {panel==='sources'&&<><p>수업 자료, 교정을 반영한 설명, 새로 만든 보충을 구분해서 읽어주세요.</p><label className="check-row"><input type="checkbox" checked={showSources} onChange={e=>setShowSources(e.target.checked)}/>본문마다 출처 표시</label><ul className="source-list">{book.sources.map(s=><li key={s.id}><strong>{s.id}</strong><span>{s.label}</span></li>)}</ul><Link to={'/books/'+bookId+'/about'}>자료 대응과 이 책 정보</Link></>}
       {panel==='notes'&&<><p>이 페이지에서 이해한 것과 아직 궁금한 것을 적어보세요. 메모는 같은 브라우저에 자동 저장돼요.</p><label className="field-label" htmlFor="reader-note">페이지 메모</label><textarea id="reader-note" rows={12} maxLength={50000} value={note} onChange={e=>updateNote(e.target.value)}/><p role="status" className="save-status">{saveMessage}</p><Link to="/settings">기록을 파일로 보관하기</Link></>}
     </div></>}
-  </div>;
+  </div></WordHelpProvider>;
 }

@@ -3174,3 +3174,26 @@ img {
  .app-header .brand-mark{display:none}
 }
 @media(max-width:350px){.app-header .brand{font-size:14px}}
+
+/* Inline word explanations keep reading on the current page. */
+button.word-link{display:inline;min-height:0;min-width:0;padding:0;margin:0;border:0;border-radius:3px;background:transparent;color:inherit;font:inherit;line-height:inherit;letter-spacing:inherit;text-align:inherit;vertical-align:baseline;text-decoration:underline dotted #007aff8c;text-underline-offset:.2em;text-decoration-thickness:1px;box-shadow:none;white-space:inherit}
+button.word-link:hover{background:var(--wash);color:var(--accent-text)}
+button.word-link:active{transform:none}
+.word-help-hint{margin:0 0 28px;color:var(--muted);font-size:12px;line-height:1.8}
+.word-popover{position:fixed;inset:auto;margin:0;padding:20px;width:min(360px,calc(100vw - 24px));max-width:none;max-height:calc(100dvh - 24px);overflow:auto;overscroll-behavior:contain;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);box-shadow:0 8px 24px #202a3a17,0 24px 64px #202a3a14;opacity:0;transform:translateY(3px);transition:opacity 180ms var(--ease),transform 180ms var(--ease),display 180ms allow-discrete,overlay 180ms allow-discrete}
+.word-popover:popover-open{opacity:1;transform:translateY(0)}
+.word-popover::backdrop{background:transparent}
+.word-popover-header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.word-popover-header h2{margin:0;font-size:26px;font-weight:650;line-height:1.5;overflow-wrap:anywhere}
+.word-popover-header button{display:grid;place-items:center;flex-shrink:0;width:44px;height:44px;padding:0;border:0;border-radius:12px;background:transparent;color:var(--muted)}
+.word-popover-header button:hover{background:var(--wash);color:var(--accent-text)}
+.word-reading{margin:4px 0;color:var(--muted);font-size:16px;line-height:1.8}
+.word-meaning{margin:8px 0 0;font-size:18px;font-weight:550;line-height:1.7}
+.word-kanji{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.word-kanji h3{margin:0 0 10px;color:var(--muted);font-size:12px;font-weight:500}
+.word-kanji dl{display:grid;gap:10px;margin:0}
+.word-kanji dl>div{display:flex;align-items:baseline;gap:16px}
+.word-kanji dt{min-width:24px;font-size:22px;font-weight:550}
+.word-kanji dd{margin:0;font-size:15px;line-height:1.8}
+.word-note{margin:18px 0 0;color:var(--muted);font-size:13px;line-height:1.9;overflow-wrap:anywhere}
+@starting-style{.word-popover:popover-open{opacity:0;transform:translateY(3px)}}
