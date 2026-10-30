@@ -24,11 +24,11 @@ export function HomeDashboard({library}:{library:Library}){
  return <section className="dashboard-panel" aria-labelledby="dashboard-title">
   <header className="dashboard-heading"><p className="dashboard-label">MY LIBRARY</p><h1 id="dashboard-title">오늘도, 한 걸음 더.</h1><p>배움의 기록을 한곳에서 관리하세요.</p></header>
   <dl className="dashboard-stats"><div><dt>전체 자료</dt><dd>{data.books.length}<span className="sr-only">권의 학습책</span></dd></div><div><dt>학습 진행률</dt><dd>{overview.percent}%</dd></div></dl>
-  <p className="dashboard-measure">학습책 {data.books.length}권 · {overview.totalPages}페이지 중 {overview.readPages}페이지 읽음</p>
-  <section className="dashboard-recent" aria-labelledby="recent-heading"><div className="dashboard-section-heading"><h2 id="recent-heading">{recent.length?'최근 학습 자료':'처음 펼쳐볼 자료'}</h2><Link to="/library">내 서재<ArrowRight size={15}/></Link></div>
+  <p className="dashboard-measure sr-only">학습책 {data.books.length}권 · {overview.totalPages}페이지 중 {overview.readPages}페이지 읽음</p>
+  <section className="dashboard-recent" aria-labelledby="recent-heading"><div className="dashboard-section-heading"><h2 id="recent-heading">{recent.length?'최근 학습 자료':'처음 펼쳐볼 자료'}</h2></div>
    {items.length?<div className="dashboard-recent-list">{items.map(row=><Link className="dashboard-recent-item" key={row.book.id} to={recent.length&&row.progress?pageLink(row.book.id,row.progress.pageId):'/books/'+row.book.id}><span className="document-icon"><FileText size={25} aria-hidden="true"/></span><div><h3>{row.book.title}</h3><p>{recent.length&&row.progress?'읽던 곳에서 이어서 · '+row.readPages.length+' / '+row.book.pages.length+'페이지 읽음':row.book.pages.length+'개의 학습 페이지 · 첫 장을 펼쳐보세요'}</p></div><ChevronRight size={23} aria-hidden="true"/></Link>)}</div>:<div className="dashboard-empty"><BookOpen size={30}/><p>첫 학습책을 준비하고 있어요.</p><Link className="text-link" to="/library">내 서재 둘러보기<ArrowRight size={16}/></Link></div>}
   </section>
-  <nav className="dashboard-shortcuts" aria-label="학습 바로가기"><Link to="/bookmarks"><BookmarkIcon size={17}/><span>북마크 {data.bookmarks.length}개</span><ChevronRight size={15}/></Link><Link to="/progress"><Check size={17}/><span>내 학습 현황</span><ChevronRight size={15}/></Link></nav>
+
  </section>;
 }
 

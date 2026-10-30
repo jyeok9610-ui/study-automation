@@ -283,3 +283,6 @@ The bookmark collection uses an opaque white list with quiet dividers, document/
 - **Don't** replace books with unrelated decorative image cards.
 - **Don't** use motion or stronger glass as a substitute for clear text hierarchy.
 
+
+### Homepage reference composition (2026-10-30)
+The homepage uses one enclosing rounded frame, a spanning brand/search/settings header, an unboxed left navigation and a large opaque white content panel. The panel presents the heading, two substantial statistic tiles and the real material list. Keep the accepted Light Mode palette and glass system on other routes. Home navigation stays on the left on narrow screens; other routes retain their mobile dock. PrimaryNavigation and SkipLink are shared to preserve route and keyboard behavior. Statistics remain derived from actual books and stored reading progress; no sample materials or percentages are introduced.
