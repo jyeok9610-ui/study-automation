@@ -14,12 +14,12 @@ test('Home menu opens, dismisses outside and with Escape, and closes on navigati
  await page.goto('/');await expect(page.locator('.dashboard-panel')).toBeVisible();
  const panel=page.locator('#home-navigation');
  await expect(panel).toBeHidden();
- await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await expect(panel).toBeVisible();
- const bounds=await panel.boundingBox();expect(bounds!.x).toBeGreaterThanOrEqual(0);expect(bounds!.x+bounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
- await page.locator('.home-window-footer').click();await expect(panel).toBeHidden();
+ await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await expect(panel).toBeVisible();await expect.poll(async()=>Math.round((await panel.boundingBox())!.x)).toBe(0);
+ const bounds=await panel.boundingBox();expect(Math.abs(bounds!.x)).toBeLessThanOrEqual(1);expect(Math.abs(bounds!.y)).toBeLessThanOrEqual(1);expect(Math.abs(bounds!.height-page.viewportSize()!.height)).toBeLessThanOrEqual(1);expect(bounds!.x+bounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width-40);
+ await page.mouse.click(page.viewportSize()!.width-12,page.viewportSize()!.height/2);await expect(panel).toBeHidden();
  await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();
  await panel.getByRole('link',{name:'홈',exact:true}).focus();await page.keyboard.press('Escape');await expect(panel).toBeHidden();await expect(page.getByRole('button',{name:'메뉴 열기',exact:true})).toBeFocused();
- await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await page.getByRole('button',{name:'메뉴 닫기',exact:true}).click();await expect(panel).toBeHidden();
+ await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await panel.getByRole('button',{name:'메뉴 닫기',exact:true}).click();await expect(panel).toBeHidden();
  await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await panel.getByRole('link',{name:'홈',exact:true}).click();await expect(panel).toBeHidden();
  await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await panel.getByRole('link',{name:'내 서재',exact:true}).click();await expect(page).toHaveURL(/#\/library$/);
  await page.goto('/#/map');await expect(page.locator('.concept-panel')).toBeVisible();
