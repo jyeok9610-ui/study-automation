@@ -3197,3 +3197,11 @@ button.word-link:active{transform:none}
 .word-kanji dd{margin:0;font-size:15px;line-height:1.8}
 .word-note{margin:18px 0 0;color:var(--muted);font-size:13px;line-height:1.9;overflow-wrap:anywhere}
 @starting-style{.word-popover:popover-open{opacity:0;transform:translateY(3px)}}
+
+.word-popover-header h2{line-height:2.2}
+.word-popover-header ruby{ruby-align:center}
+.word-popover-header rt{font-size:12px;font-weight:500;color:var(--accent-text);line-height:1.4;letter-spacing:0}
+.word-kanji dd{display:grid;gap:2px}
+.word-kanji-reading{color:var(--accent-text);font-size:16px;font-weight:550}
+.word-kanji-meaning{font-size:14px}
+.word-reading-note{margin:0 0 14px;color:var(--muted);font-size:12px;line-height:1.8}
