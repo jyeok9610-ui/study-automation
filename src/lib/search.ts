@@ -6,7 +6,7 @@ export function searchBooks(books:Book[],query:string,subject='',level=''):Searc
   if(!words.length) return [];
   return books.filter(b=>(!subject||b.subject===subject)&&(!level||b.level===level)).flatMap(b=>
     b.pages.flatMap(p=>{
-      const text=[p.goal,...p.blocks.flatMap(x=>[x.title||'',x.text||'',...(x.examples||[]).flatMap(e=>[e.ja,e.reading,e.meaning]),...(x.rows||[]).flat(),x.question?.prompt||'',...(x.question?.options||[])])].join(' ');
+      const text=[p.goal,...p.blocks.flatMap(x=>[x.title||'',x.text||'',...(x.examples||[]).flatMap(e=>[e.ja,e.reading,e.meaning]),...(x.rows||[]).flat(),x.question?.prompt||'',x.reflection?.prompt||'',...(x.question?.options||[])])].join(' ');
       const all=normalize(b.title+' '+p.title+' '+text);
       return words.every(w=>all.includes(w))?[{bookId:b.id,pageId:p.id,title:p.title,bookTitle:b.title,subject:b.subject,level:b.level,snippet:text.slice(Math.max(0,normalize(text).indexOf(words[0])-35),Math.max(0,normalize(text).indexOf(words[0])-35)+140)}]:[];
     })

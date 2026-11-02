@@ -8,7 +8,7 @@ import { parseReading } from '../src/lib/storage.ts';
 const book=JSON.parse(fs.readFileSync(path.resolve('public/content/books/first-sentences.json'),'utf8'));
 const library=LibrarySchema.parse(JSON.parse(fs.readFileSync(path.resolve('public/content/library.json'),'utf8')));
 test('실제 원자료01 책의 원문·문항·용어집·연결을 검증한다',()=>{
- const b=validateBook(book);assert.equal(b.pages.length,8);assert.ok(b.pages.flatMap(p=>p.blocks).filter(b=>b.type==='question').length>=20);assert.equal(new Set(b.coverage.map(c=>c.sourceId)).size,10);assert.ok(b.glossary.length>=20);validateLibraryLinks(library,[b]);
+ const b=validateBook(book);assert.equal(b.pages.length,8);assert.ok(b.pages.flatMap(p=>p.blocks).filter(b=>b.type==='question').length>=20);assert.equal(new Set(b.coverage.map(c=>c.sourceId)).size,10);assert.ok(b.glossary.length>=20);validateLibraryLinks(library,library.books.map(summary=>validateBook(JSON.parse(fs.readFileSync(path.resolve('public/content/books',summary.id+'.json'),'utf8')))));
  for(const p of b.pages)for(const block of p.blocks)if(block.question)assert.ok(block.question.explanation.length>15);
 });
 test('없는 출처·정답 번호·중복 ID·경로 유출을 거부한다',()=>{

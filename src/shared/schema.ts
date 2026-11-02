@@ -5,13 +5,15 @@ export const QuestionSchema = z.object({
   prompt: z.string().min(1), options: z.array(z.string()).min(2), answer: z.number().int().nonnegative(),
   explanation: z.string().min(15), wrongExplanations: z.array(z.string()).optional(),
 }).refine(q => q.answer < q.options.length, '정답 번호가 선택지 범위를 벗어났습니다.');
+export const ReflectionSchema = z.object({ prompt:z.string().min(1), explanation:z.string().min(15) });
 export const BlockSchema = z.object({
-  id: z.string().regex(/^[a-z0-9-]+$/), type: z.enum(['text','example','table','question','dialogue','position','sentence','callout','counter']),
+  id: z.string().regex(/^[a-z0-9-]+$/), type: z.enum(['text','example','table','question','dialogue','position','sentence','callout','counter','reflection']),
   title: z.string().optional(), text: z.string().optional(), examples: z.array(ExampleSchema).optional(),
   headers: z.array(z.string()).optional(), rows: z.array(z.array(z.string())).optional(),
-  question: QuestionSchema.optional(), sourceIds: z.array(z.string()).min(1),
+  question: QuestionSchema.optional(), reflection: ReflectionSchema.optional(), sourceIds: z.array(z.string()).min(1),
   provenance: z.enum(['source','supplement','correction']),
 }).superRefine((b,c) => {
+  if (b.type === 'reflection' && !b.reflection) c.addIssue({code:'custom',message:'서술형 질문과 해설이 없습니다.'});
   if (b.type === 'question' && !b.question) c.addIssue({code:'custom',message:'문제 본문이 없습니다.'});
   if (b.type === 'example' && !b.examples?.length) c.addIssue({code:'custom',message:'예문이 없습니다.'});
   if (b.type === 'table' && (!b.headers?.length || !b.rows?.length)) c.addIssue({code:'custom',message:'표 데이터가 없습니다.'});
@@ -24,7 +26,7 @@ export const BookSchema = z.object({
   id:z.string().regex(/^[a-z0-9-]+$/), version:z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/), subject:z.string(), section:z.string(), title:z.string().min(2),
   subtitle:z.string(), level:z.string(), minutes:z.number().positive(), coverColor:z.string().regex(/^#[0-9a-fA-F]{6}$/),
   summary:z.string(),objectives:z.array(z.string()).min(1), prerequisites:z.array(z.string()),
-  sources:z.array(z.object({id:z.string(),label:z.string(),url:z.string().url().optional()})).min(1),
+  sources:z.array(z.object({id:z.string(),label:z.string(),url:z.string().url().refine(value=>/^https?:\/\//i.test(value),'출처 URL은 HTTP(S) 주소여야 합니다.').optional()})).min(1),
   pages:z.array(PageSchema).min(1),
   glossary:z.array(z.object({id:z.string(),word:z.string(),reading:z.string(),meaning:z.string(),note:z.string()})),
   coverage:z.array(z.object({sourceId:z.string(),status:z.enum(['covered','duplicate','reference']),pageIds:z.array(z.string()),reason:z.string()})),

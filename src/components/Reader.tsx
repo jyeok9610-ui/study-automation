@@ -18,10 +18,23 @@ function QuestionCard({block}:{block:Block}) {
   {reveal&&<div className="explanation"><strong>함께 이해하기</strong><p><WordText text={q.explanation}/></p></div>}
   {selected!==null&&<ResetButton onClick={()=>{setSelected(null);setReveal(false);}}/>}</div>;
 }
+function ReflectionCard({block}:{block:Block}) {
+  const question=block.reflection!,[answer,setAnswer]=useState('');
+  const answerId=block.id+'-answer',hintId=block.id+'-hint';
+  return <div className="question reflection"><h3>{block.title||'생각을 적어 볼까요?'}</h3>
+    <p className="reflection-prompt">{question.prompt}</p>
+    <label className="field-label" htmlFor={answerId}>생각 적기</label>
+    <textarea id={answerId} aria-describedby={hintId} rows={4} maxLength={5000} value={answer} onChange={event=>setAnswer(event.target.value)}/>
+    <p id={hintId} className="reflection-hint">이 답은 페이지를 떠나거나 새로고침하면 비워집니다. 보관할 생각은 메모에 적어주세요.</p>
+    <details className="reflection-explanation"><summary>해설과 검토 기준 보기</summary>
+      <div className="explanation">{question.explanation.split(/\n{2,}/).map((text,index)=><p key={index}>{text}</p>)}</div>
+    </details>
+  </div>;
+}
 function BlockView({block,showSources,epoch}:{block:Block;showSources:boolean;epoch:number}) {
-  const provenance=block.provenance==='supplement'?'이해를 돕는 보충':block.provenance==='correction'?'교정을 반영한 설명':'수업 자료에서';
+  const provenance=block.provenance==='supplement'?'이해를 돕는 보충':block.provenance==='correction'?'교정을 반영한 설명':'원자료를 바탕으로';
   return <section className={'learning-block block-'+block.type} id={block.id} data-block-id={block.id}>
-    {block.type==='question'?<QuestionCard key={block.id+'-'+epoch} block={block}/>:<>
+    {block.type==='question'?<QuestionCard key={block.id+'-'+epoch} block={block}/>:block.type==='reflection'?<ReflectionCard key={block.id+'-'+epoch} block={block}/>:<>
       {block.title&&<h2><WordText text={block.title}/></h2>}
       {block.text&&block.text.split(/\n{2,}/).map((v,i)=><p key={i}><WordText text={v}/></p>)}
       {block.examples?.map((e,i)=><div className="example" key={i}><div className="example-speech"><p className="japanese" lang="ja"><WordText text={e.ja}/></p><SpeechButton text={e.reading} label="일본어 예문"/></div><p className="reading" lang="ja">{e.reading}</p><p className="meaning">{e.meaning}</p>{e.note&&<p><WordText text={e.note}/></p>}</div>)}
@@ -103,13 +116,13 @@ export default function Reader() {
       <article className="reading-paper"><header className="page-header"><Link to={'/subjects/'+book.subject}>{book.section}</Link><h1><WordText text={page.title}/></h1><p className="page-goal"><WordText text={page.goal}/></p><span className="read-time">차근차근 약 {page.minutes}분</span></header>
         {book.subject==='japanese'&&<p className="word-help-hint">파란색 단어를 누르면 읽기와 한자 풀이를 볼 수 있어요.</p>}
         {page.blocks.map(block=><BlockView key={block.id+'-'+epoch} block={block} epoch={epoch} showSources={showSources}/>)}
-        <footer className="page-end"><BookOpen size={30}/><h2>오늘 이해한 것을 한 문장으로 말해 보세요</h2><p>정답을 외웠는지보다, 왜 그런 표현을 쓰는지 설명할 수 있는지 확인해 보세요.</p><div className="choice-row"><button aria-pressed={progress?.readPages.includes(pageId)||false} onClick={()=>mark('readPages')}><Check size={17}/>읽음 표시</button><button aria-pressed={progress?.reviewPages.includes(pageId)||false} onClick={()=>mark('reviewPages')}>복습 표시</button></div><p className="save-status" role="status">{saveMessage}</p><p className="quiet">읽던 위치와 진도는 이 브라우저에 남아요. 문제와 이전 풀이 기록은 다시 열 때 비워져요.</p></footer>
+        <footer className="page-end"><BookOpen size={30}/><h2>오늘 이해한 것을 한 문장으로 말해 보세요</h2><p>정답을 외웠는지보다, 왜 그렇게 생각하는지 설명할 수 있는지 확인해 보세요.</p><div className="choice-row"><button aria-pressed={progress?.readPages.includes(pageId)||false} onClick={()=>mark('readPages')}><Check size={17}/>읽음 표시</button><button aria-pressed={progress?.reviewPages.includes(pageId)||false} onClick={()=>mark('reviewPages')}>복습 표시</button></div><p className="save-status" role="status">{saveMessage}</p><p className="quiet">읽던 위치와 진도는 이 브라우저에 남아요. 문제와 이전 풀이 기록은 다시 열 때 비워져요.</p></footer>
       </article>
       <nav className="page-nav" aria-label="페이지 이동">{index>0?<Link to={'/books/'+bookId+'/pages/'+book.pages[index-1].id}><ArrowLeft size={18}/><span><small>이전</small>{book.pages[index-1].title}</span></Link>:<Link to={'/books/'+bookId}><ArrowLeft size={18}/>목차</Link>}{index<book.pages.length-1?<Link to={'/books/'+bookId+'/pages/'+book.pages[index+1].id}><span><small>다음</small>{book.pages[index+1].title}</span><ArrowRight size={18}/></Link>:<Link to={'/subjects/'+book.subject}>내부 서재로<ArrowRight size={18}/></Link>}</nav>
     </main>
-    {panel&&<><div className="sheet-scrim" aria-hidden="true"/><div ref={sheetRef} tabIndex={-1} className="side-sheet" role="dialog" aria-modal={mobilePanel} aria-label={panel==='dictionary'?'한자와 어휘 사전':panel==='sources'?'출처와 보충 설명':'내 메모'}><div className="sheet-header"><h2>{panel==='dictionary'?'읽다가 궁금한 말':panel==='sources'?'자료와 보충의 구분':'내 메모'}</h2><button aria-label="도움말 닫기" onClick={()=>setPanel(null)}><X size={21}/></button></div>
-      {panel==='dictionary'&&<><label className="field-label" htmlFor="dictionary-search">단어·읽기·뜻 찾기</label><input id="dictionary-search" value={dictionaryQuery} onChange={e=>setDictionaryQuery(e.target.value)} placeholder="예: 私, わたし, 나"/><div className="dictionary-list">{dictionaryEntries.filter(v=>(v.word+' '+v.reading+' '+v.meaning).includes(dictionaryQuery)).map(v=><details key={v.id}><summary><span lang="ja">{v.word}</span><small>{v.meaning}</small></summary><WordDefinition entry={v}/></details>)}</div></>}
-      {panel==='sources'&&<><p>수업 자료, 교정을 반영한 설명, 새로 만든 보충을 구분해서 읽어주세요.</p><label className="check-row"><input type="checkbox" checked={showSources} onChange={e=>setShowSources(e.target.checked)}/>본문마다 출처 표시</label><ul className="source-list">{book.sources.map(s=><li key={s.id}><strong>{s.id}</strong><span>{s.label}</span></li>)}</ul><Link to={'/books/'+bookId+'/about'}>자료 대응과 이 책 정보</Link></>}
+    {panel&&<><div className="sheet-scrim" aria-hidden="true"/><div ref={sheetRef} tabIndex={-1} className="side-sheet" role="dialog" aria-modal={mobilePanel} aria-label={panel==='dictionary'?(book.subject==='japanese'?'한자와 어휘 사전':'용어 사전'):panel==='sources'?'출처와 보충 설명':'내 메모'}><div className="sheet-header"><h2>{panel==='dictionary'?'읽다가 궁금한 말':panel==='sources'?'자료와 보충의 구분':'내 메모'}</h2><button aria-label="도움말 닫기" onClick={()=>setPanel(null)}><X size={21}/></button></div>
+      {panel==='dictionary'&&<><label className="field-label" htmlFor="dictionary-search">단어·읽기·뜻 찾기</label><input id="dictionary-search" value={dictionaryQuery} onChange={e=>setDictionaryQuery(e.target.value)} placeholder={book.subject==='japanese'?'예: 私, わたし, 나':'예: 논증, 직관, 정합성'}/><div className="dictionary-list">{dictionaryEntries.filter(v=>(v.word+' '+v.reading+' '+v.meaning).includes(dictionaryQuery)).map(v=><details key={v.id}><summary><span lang={book.subject==='japanese'?'ja':'ko'}>{v.word}</span><small>{v.meaning}</small></summary>{book.subject==='japanese'?<WordDefinition entry={v}/>:<><p className="word-reading" lang="en">{v.reading}</p><p className="word-meaning">{v.meaning}</p><p className="word-note">{v.note}</p></>}</details>)}</div></>}
+      {panel==='sources'&&<><p>원자료, 교정을 반영한 설명, 새로 만든 보충을 구분해서 읽어주세요.</p><label className="check-row"><input type="checkbox" checked={showSources} onChange={e=>setShowSources(e.target.checked)}/>본문마다 출처 표시</label><ul className="source-list">{book.sources.map(s=><li key={s.id}><strong>{s.id}</strong><span>{s.label}</span>{s.url&&<a href={s.url} target="_blank" rel="noopener noreferrer">원문과 이용 조건 보기</a>}</li>)}</ul><Link to={'/books/'+bookId+'/about'}>자료 대응과 이 책 정보</Link></>}
       {panel==='notes'&&<><p>이 페이지에서 이해한 것과 아직 궁금한 것을 적어보세요. 메모는 같은 브라우저에 자동 저장돼요.</p><label className="field-label" htmlFor="reader-note">페이지 메모</label><textarea id="reader-note" rows={12} maxLength={50000} value={note} onChange={e=>updateNote(e.target.value)}/><p role="status" className="save-status">{saveMessage}</p><Link to="/settings">기록을 파일로 보관하기</Link></>}
     </div></>}
   </div></WordHelpProvider></DeviceSpeechProvider>;

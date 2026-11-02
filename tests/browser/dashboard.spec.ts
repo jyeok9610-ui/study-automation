@@ -2,13 +2,14 @@ import { test, expect } from '@playwright/test';
 import fs from 'node:fs/promises';
 
 test('홈은 실제 자료와 읽음 진도를 보여주고 현황으로 이어진다',async({page})=>{
+ const catalog=JSON.parse(await fs.readFile('public/content/library.json','utf8'));const percent=Math.round(100/catalog.books.reduce((total:number,book:{pageCount:number})=>total+book.pageCount,0))+'%';
  await page.goto('/');await expect(page.getByRole('heading',{name:'오늘도, 한 걸음 더.'})).toBeVisible();
- await expect(page.locator('.dashboard-stats dd').first()).toHaveText('1권의 학습책');await expect(page.locator('.dashboard-stats dd').last()).toHaveText('0%');
+ await expect(page.locator('.dashboard-stats dd').first()).toHaveText(catalog.books.length+'권의 학습책');await expect(page.locator('.dashboard-stats dd').last()).toHaveText('0%');
  await expect(page.getByRole('heading',{name:'처음 펼쳐볼 자료'})).toBeVisible();
  await page.goto('/#/books/first-sentences/pages/nominal');await page.getByRole('button',{name:'읽음 표시',exact:true}).click();await expect(page.getByRole('status')).toContainText(['읽음 표시를 저장했어요.']);
- await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await page.getByRole('navigation',{name:'주 메뉴'}).getByRole('link',{name:'홈',exact:true}).click();await expect(page.locator('.dashboard-stats dd').last()).toHaveText('13%');
+ await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await page.getByRole('navigation',{name:'주 메뉴'}).getByRole('link',{name:'홈',exact:true}).click();await expect(page.locator('.dashboard-stats dd').last()).toHaveText(percent);
  await expect(page.getByRole('heading',{name:'최근 학습 자료'})).toBeVisible();
- await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await page.getByRole('navigation',{name:'주 메뉴'}).getByRole('link',{name:'학습 현황',exact:true}).click();await expect(page.locator('.progress-summary strong')).toHaveText('13%');await expect(page.locator('.read-indicator.is-read')).toHaveCount(1);
+ await page.getByRole('button',{name:'메뉴 열기',exact:true}).click();await page.getByRole('navigation',{name:'주 메뉴'}).getByRole('link',{name:'학습 현황',exact:true}).click();await expect(page.locator('.progress-summary strong')).toHaveText(percent);await expect(page.locator('.read-indicator.is-read')).toHaveCount(1);
 });
 test('북마크는 새로고침·목록·해제·백업 복원까지 유지된다',async({page})=>{
  await page.goto('/#/books/first-sentences/pages/nominal');await page.getByRole('button',{name:'북마크 추가',exact:true}).click();await expect(page.getByRole('button',{name:'북마크 해제',exact:true})).toHaveAttribute('aria-pressed','true');

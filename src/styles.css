@@ -450,7 +450,7 @@ img {
 }
 .subject-shelf {
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(175px,1fr));
   gap:22px;
 }
 .subject-book {
@@ -3218,3 +3218,10 @@ button.speech-button:hover,button.speech-button[aria-pressed=true]{background:va
 .example-speech>.speech-control{display:contents}
 .example-speech>.speech-control>.speech-button{grid-column:2;grid-row:1}
 .example-speech>.speech-control>.speech-feedback{grid-column:1/-1;max-width:none;margin:0}
+
+.reflection textarea { min-height:120px; margin-top:8px; resize:vertical; }
+.reflection-prompt,.reflection-explanation p { white-space:pre-line; overflow-wrap:anywhere; }
+.reflection .reflection-hint { font-size:12px; color:var(--muted); }
+.reflection-explanation { margin-top:20px; }
+.reflection-explanation summary { cursor:pointer; color:var(--accent-text); line-height:1.7; font-weight:600; }
+.reflection-explanation .explanation { margin-top:12px; }
