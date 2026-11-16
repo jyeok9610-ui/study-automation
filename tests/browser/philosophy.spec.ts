@@ -33,6 +33,7 @@ test('철학 서재에서 답과 해설을 사용하고 메모·북마크만 보
  await expect(page.getByRole('status')).toContainText(['메모를 저장했어요.']);
  await page.getByRole('button',{name:'도움말 닫기'}).click();
  await page.getByRole('button',{name:'읽음 표시',exact:true}).click();
+ await expect(page.getByRole('status')).toContainText(['읽음 표시를 저장했어요.']);
  await page.reload();
  await expect(page.locator('.reflection').first().getByLabel('생각 적기')).toHaveValue('');
  await expect(page.locator('.reflection').first().locator('details')).not.toHaveAttribute('open','');

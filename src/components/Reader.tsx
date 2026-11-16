@@ -82,7 +82,10 @@ export default function Reader() {
   useEffect(()=>{
     if(!book||!page)return;let timer:ReturnType<typeof setTimeout>|undefined;let disposed=false;
     getProgress(bookId).then(p=>{
-      if(disposed)return;progressRef.current=p;setProgress(p);
+      if(disposed)return;
+      const current=progressRef.current;
+      if(current&&(!p||current.updatedAt>=p.updatedAt))p=current;
+      progressRef.current=p;setProgress(p);
       if(p?.pageId===pageId && p.blockId)requestAnimationFrame(()=>requestAnimationFrame(()=>{
         if(disposed)return;const el=document.getElementById(p.blockId);if(el)window.scrollTo(0,el.getBoundingClientRect().top+window.scrollY+p.offset*el.getBoundingClientRect().height-110);restored.current=true;
       }));else restored.current=true;
@@ -94,17 +97,36 @@ export default function Reader() {
       if(!el)return;
       const base=progressRef.current;
       tracked.current={bookId,pageId,blockId:el.id,offset:Math.max(0,Math.min(1,(120-el.getBoundingClientRect().top)/Math.max(1,el.offsetHeight))),version:book.version,updatedAt:Date.now(),readPages:base?.readPages||[],reviewPages:base?.reviewPages||[]};
-      clearTimeout(timer);timer=setTimeout(()=>{if(tracked.current)saveProgress(tracked.current).catch(()=>setSaveMessage('읽기 기록을 저장하지 못했어요. 브라우저 저장 공간을 확인해주세요.'));},250);
+      clearTimeout(timer);timer=setTimeout(()=>{if(tracked.current)saveProgress(tracked.current,{kind:'position'}).catch(()=>setSaveMessage('읽기 기록을 저장하지 못했어요. 브라우저 저장 공간을 확인해주세요.'));},250);
     };
     window.addEventListener('scroll',capture,{passive:true});timer=setTimeout(capture,400);
-    return()=>{disposed=true;window.removeEventListener('scroll',capture);clearTimeout(timer);if(tracked.current)void saveProgress(tracked.current).catch(()=>{});};
+    return()=>{disposed=true;window.removeEventListener('scroll',capture);clearTimeout(timer);if(tracked.current)void saveProgress(tracked.current,{kind:'position'}).catch(()=>{});};
   },[book,page,bookId,pageId,location.key]);
-  const mark=async(field:'readPages'|'reviewPages')=>{
-    if(!book||!page)return;
-    const base=tracked.current||progressRef.current||{bookId,pageId,blockId:page.blocks[0].id,offset:0,version:book.version,updatedAt:Date.now(),readPages:[],reviewPages:[]};
-    const values=base[field].includes(pageId)?base[field].filter(x=>x!==pageId):[...base[field],pageId];
-    const next={...base,[field]:values,updatedAt:Date.now()};progressRef.current=next;tracked.current=next;setProgress(next);
-    try{await saveProgress(next);setSaveMessage(field==='readPages'?'읽음 표시를 저장했어요.':'복습 표시를 저장했어요.');}catch{setSaveMessage('기록을 저장하지 못했어요.');}
+  const mark = async (field: 'readPages' | 'reviewPages') => {
+    if (!book || !page) return;
+    const current = tracked.current || progressRef.current;
+    const base = current?.bookId === bookId && current.pageId === pageId ? current : {
+      bookId, pageId, blockId: page.blocks[0].id, offset: 0,
+      version: book.version, updatedAt: Date.now(),
+      readPages: current?.readPages || [], reviewPages: current?.reviewPages || [],
+    };
+    const values = base[field].includes(pageId)
+      ? base[field].filter(id => id !== pageId)
+      : [...base[field], pageId];
+    const next = {...base, [field]: values, updatedAt: Date.now()};
+    progressRef.current = next;
+    tracked.current = next;
+    setSaveMessage(field === 'readPages' ? '읽음 표시를 저장하고 있어요.' : '복습 표시를 저장하고 있어요.');
+    try {
+      const saved = await saveProgress(next, {kind: 'mark', field, marked: values.includes(pageId)});
+      if (progressRef.current?.bookId !== bookId || progressRef.current?.pageId !== pageId) return;
+      progressRef.current = saved;
+      tracked.current = {...(tracked.current || saved), readPages: saved.readPages, reviewPages: saved.reviewPages};
+      setProgress(saved);
+      setSaveMessage(field === 'readPages' ? '읽음 표시를 저장했어요.' : '복습 표시를 저장했어요.');
+    } catch {
+      setSaveMessage('기록을 저장하지 못했어요.');
+    }
   };
   const updateNote=(text:string)=>{setNote(text);saveNote({id:bookId+'/'+pageId,bookId,pageId,text,updatedAt:Date.now()}).then(()=>setSaveMessage('메모를 저장했어요.')).catch(()=>setSaveMessage('메모를 저장하지 못했어요.'));};
   if(error)return <div className="empty-state"><h1>책을 열지 못했어요</h1><p>{error}</p><Link to="/library">서재로 돌아가기</Link></div>;

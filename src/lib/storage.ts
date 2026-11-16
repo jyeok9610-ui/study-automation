@@ -20,11 +20,48 @@ async function transact<T>(store:Store,mode:IDBTransactionMode,work:(s:IDBObject
   });
 }
 export async function getProgress(bookId:string):Promise<Progress|undefined>{return transact('progress','readonly',s=>s.get(bookId));}
-export async function saveProgress(p:Progress) {
+type ProgressUpdate =
+  | { kind: 'position' }
+  | { kind: 'mark'; field: 'readPages' | 'reviewPages'; marked: boolean };
+
+export async function saveProgress(p: Progress, update?: ProgressUpdate): Promise<Progress> {
   // Only reading state: never accept question answers, scores or attempts.
-  const clean={id:p.bookId,bookId:p.bookId,pageId:p.pageId,blockId:p.blockId,offset:Math.max(0,Math.min(1,p.offset)),version:p.version,updatedAt:p.updatedAt,readPages:[...new Set(p.readPages)],reviewPages:[...new Set(p.reviewPages)]};
-  const database=await db();
-  await new Promise<void>((resolve,reject)=>{const tx=database.transaction('progress','readwrite'),store=tx.objectStore('progress'),request=store.get(p.bookId);request.onsuccess=()=>{const current=request.result as Progress|undefined;if(!current||current.updatedAt<=p.updatedAt)store.put(clean);};tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);});
+  const clean = {
+    id: p.bookId, bookId: p.bookId, pageId: p.pageId, blockId: p.blockId,
+    offset: Math.max(0, Math.min(1, p.offset)), version: p.version, updatedAt: p.updatedAt,
+    readPages: [...new Set(p.readPages)], reviewPages: [...new Set(p.reviewPages)],
+  };
+  const database = await db();
+  return new Promise((resolve, reject) => {
+    const tx = database.transaction('progress', 'readwrite');
+    const store = tx.objectStore('progress');
+    const request = store.get(p.bookId);
+    let saved: Progress;
+    request.onsuccess = () => {
+      const current = request.result as Progress | undefined;
+      if (current && current.updatedAt > p.updatedAt && update?.kind !== 'mark') {
+        saved = current;
+        return;
+      }
+      // A stale tab can save its position, but only an explicit mark changes page lists.
+      if (update && current) {
+        clean.readPages = [...(current.readPages || [])];
+        clean.reviewPages = [...(current.reviewPages || [])];
+        clean.updatedAt = Math.max(current.updatedAt, clean.updatedAt);
+      }
+      if (update?.kind === 'mark') {
+        const pages = clean[update.field];
+        clean[update.field] = update.marked
+          ? [...new Set([...pages, p.pageId])]
+          : pages.filter(pageId => pageId !== p.pageId);
+      }
+      saved = clean;
+      store.put(clean);
+    };
+    tx.oncomplete = () => resolve(saved);
+    tx.onerror = () => reject(tx.error || request.error);
+    tx.onabort = () => reject(tx.error);
+  });
 }
 export async function getNotes():Promise<Note[]>{return transact('notes','readonly',s=>s.getAll());}
 export async function saveNote(n:Note){ await transact('notes','readwrite',s=>s.put({id:n.id,bookId:n.bookId,pageId:n.pageId,text:n.text,updatedAt:n.updatedAt})); }
