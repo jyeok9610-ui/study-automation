@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const ExampleSchema = z.object({ ja: z.string(), reading: z.string(), meaning: z.string(), note: z.string().optional() });
+export const ExampleSchema = z.object({ ja: z.string(), reading: z.string(), meaning: z.string(), note: z.string().optional(), role: z.enum(['question','answer']).optional() });
 export const QuestionSchema = z.object({
   prompt: z.string().min(1), options: z.array(z.string()).min(2), answer: z.number().int().nonnegative(),
   explanation: z.string().min(15), wrongExplanations: z.array(z.string()).optional(),

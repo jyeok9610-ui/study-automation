@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { WordText } from './WordHelp';
-import { ArrowRight, RotateCcw } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 export function DialogueLab() {
   const [scene,setScene]=useState<'intro'|'who'>('intro');
   const [answer,setAnswer]=useState('');
@@ -8,7 +8,18 @@ export function DialogueLab() {
   return <div className="lab"><h4>질문이 바뀌면 말의 역할도 바뀌어요</h4>
     <p>똑같은 두 단어를 두고, 대화의 상황만 바꿔 보세요.</p>
     <div className="segmented"><button aria-pressed={scene==='intro'} onClick={()=>choose('intro')}>처음 만나 자기소개</button><button aria-pressed={scene==='who'} onClick={()=>choose('who')}>학생인 사람 찾기</button></div>
-    <div className="conversation"><div><span>상대방</span><p lang="ja"><WordText text={scene==='intro'?'はじめまして。自己紹介をお願いします。':'誰が学生ですか。'}/></p><small>{scene==='intro'?'처음 뵙겠습니다. 자기소개 부탁드려요.':'누가 학생이에요?'}</small></div><ArrowRight aria-hidden="true"/><div><span>내가 전할 말</span><p lang="ja"><WordText text="私 "/><strong>{answer||'？'}</strong><WordText text=" 学生です。"/></p><small>저는/제가 학생이에요.</small></div></div>
+    <div className="conversation">
+      <div>
+        <span>질문 :</span>
+        <p lang="ja"><WordText text={scene==='intro'?'はじめまして。自己紹介をお願いします。':'誰が学生ですか。'}/></p>
+        <small>{scene==='intro'?'처음 뵙겠습니다. 자기소개 부탁드려요.':'누가 학생이에요?'}</small>
+      </div>
+      <div>
+        <span>답변 :</span>
+        <p lang="ja"><WordText text="私 "/><strong>{answer||'？'}</strong><WordText text=" 学生です。"/></p>
+        <small>저는/제가 학생이에요.</small>
+      </div>
+    </div>
     <div className="choice-row"><button className={answer==='は'?'selected':''} onClick={()=>setAnswer('は')}>は를 넣어 보기</button><button className={answer==='が'?'selected':''} onClick={()=>setAnswer('が')}>が를 넣어 보기</button></div>
     <p className="lab-feedback" aria-live="polite">{!answer?'어느 부분을 알려주고 싶은지 생각하고 골라 보세요.':scene==='intro'?(answer==='は'?'지금은 나를 소개하는 자리예요. 私は로 나를 이야기의 주제로 꺼내고, 学生です로 설명하는 흐름이 자연스러워요.':'私が도 문법적으로 가능하지만 “학생인 사람은 바로 나”를 골라 말하는 느낌이 돼요. 평범한 자기소개라면 私は가 더 잘 어울려요.'):(answer==='が'?'상대가 궁금한 것은 “누구”예요. 誰が의 誰 자리에 私를 넣어 私が라고 답해요.':'私は로도 상황을 더 이어갈 수 있지만, 여기서 직접 “누가”인지를 답하려면 私が가 더 잘 맞아요. 대화 전체를 같이 보세요.')}</p>
   </div>;

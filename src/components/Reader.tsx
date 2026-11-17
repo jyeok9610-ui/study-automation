@@ -37,7 +37,18 @@ function BlockView({block,showSources,epoch}:{block:Block;showSources:boolean;ep
     {block.type==='question'?<QuestionCard key={block.id+'-'+epoch} block={block}/>:block.type==='reflection'?<ReflectionCard key={block.id+'-'+epoch} block={block}/>:<>
       {block.title&&<h2><WordText text={block.title}/></h2>}
       {block.text&&block.text.split(/\n{2,}/).map((v,i)=><p key={i}><WordText text={v}/></p>)}
-      {block.examples?.map((e,i)=><div className="example" key={i}><div className="example-speech"><p className="japanese" lang="ja"><WordText text={e.ja}/></p><SpeechButton text={e.reading} label="일본어 예문"/></div><p className="reading" lang="ja">{e.reading}</p><p className="meaning">{e.meaning}</p>{e.note&&<p><WordText text={e.note}/></p>}</div>)}
+      {block.examples?.map((example,index)=>(
+        <div className="example" key={index}>
+          {example.role&&<p className="example-role">{example.role==='question'?'질문 :':'답변 :'}</p>}
+          <div className="example-speech">
+            <p className="japanese" lang="ja"><WordText text={example.ja}/></p>
+            <SpeechButton text={example.reading} label="일본어 예문"/>
+          </div>
+          <p className="reading" lang="ja">{example.reading}</p>
+          <p className="meaning">{example.meaning}</p>
+          {example.note&&<p><WordText text={example.note}/></p>}
+        </div>
+      ))}
       {block.type==='table'&&<div className="table-scroll" role="region" aria-label={block.title||'학습 표'} tabIndex={0}><table><thead><tr>{block.headers?.map((h,i)=><th key={i}><WordText text={h}/></th>)}</tr></thead><tbody>{block.rows?.map((row,i)=><tr key={i}>{row.map((cell,j)=><td key={j}><WordText text={cell}/></td>)}</tr>)}</tbody></table></div>}
       {block.type==='dialogue'&&<DialogueLab/>}{block.type==='position'&&<PositionLab/>}{block.type==='sentence'&&<SentenceLab/>}{block.type==='counter'&&<CounterLab/>}
     </>}

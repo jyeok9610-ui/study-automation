@@ -1621,6 +1621,12 @@ img {
 .example p {
   line-height:1.8;
 }
+.example .example-role {
+  margin:0 0 10px;
+  font-size:15px;
+  font-weight:700;
+  color:var(--ink);
+}
 .example .japanese {
   font-size:22px;
   font-weight:550;
@@ -1636,7 +1642,7 @@ img {
   margin-top:8px;
   color:#3e4550;
 }
-.example p:not(.japanese):not(.reading):not(.meaning) {
+.example p:not(.japanese):not(.reading):not(.meaning):not(.example-role) {
   font-size:13px;
   color:#626975;
   margin-top:12px;
@@ -1807,7 +1813,7 @@ img {
 }
 .conversation {
   display:grid;
-  grid-template-columns:1fr auto 1fr;
+  grid-template-columns:1fr;
   align-items:center;
   gap:14px;
   margin:22px 0;
@@ -1819,8 +1825,9 @@ img {
   min-width:0;
 }
 .conversation span {
-  font-size:11px;
-  color:var(--muted);
+  font-size:15px;
+  font-weight:700;
+  color:var(--ink);
 }
 .conversation p {
   font-size:18px;
@@ -1830,9 +1837,6 @@ img {
 .conversation small {
   color:#656d79;
   font-size:11px;
-}
-.conversation>svg {
-  color:#6997cc;
 }
 .lab-feedback {
   background:#e7f1ff;
@@ -2822,11 +2826,6 @@ img {
   .conversation {
     grid-template-columns:1fr;
     gap:8px;
-  }
-  .conversation>svg {
-    transform:rotate(90deg);
-    justify-self:center;
-    width:18px;
   }
   .conversation>div {
     padding:16px;
