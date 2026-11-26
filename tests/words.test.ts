@@ -16,8 +16,18 @@ test('단어 전체를 긴 일치부터 연결하고 원문과 반복 호출을 
  assert.deepEqual(split('学生です').filter(p=>p.entry).map(p=>p.text),['学生']);
  assert.equal(split('未登録語・大学生・214日').filter(p=>p.entry).length,0);
 });
-test('원래 단어와 보충 단어의 구성 한자 풀이를 빠짐없이 연결한다',()=>{
- for(const entry of entries){assert.ok(split(entry.word).some(p=>p.entry?.word===entry.word),entry.word);for(const character of entry.word.match(/\p{Script=Han}/gu)||[])assert.ok(meanings[character],character);}
+test('발행된 일본어책의 단어와 보충 단어에 모든 구성 한자 풀이가 있다',()=>{
+ const library=JSON.parse(fs.readFileSync('public/content/library.json','utf8'));
+ for(const summary of library.books.filter((book:{subject:string})=>book.subject==='japanese')){
+  const {glossary}=JSON.parse(fs.readFileSync('public/content/books/'+summary.id+'.json','utf8'));
+  const bookEntries=getWordEntries(glossary),matchBookWord=createWordMatcher(bookEntries);
+  for(const entry of bookEntries){
+   assert.ok(matchBookWord(entry.word).some(part=>part.entry?.word===entry.word),entry.word);
+   for(const character of entry.word.match(/\p{Script=Han}/gu)||[]){
+    assert.ok(meanings[character],summary.id+' / '+entry.word+' / '+character);
+   }
+  }
+ }
  assert.equal(meanings.学,'배울 학');assert.equal(meanings.生,'날 생');
  assert.equal(split('<学生>')[1].text,'学生');
 });
